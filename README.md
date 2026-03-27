@@ -93,7 +93,8 @@ wordpress-ical-calendar/
 │       └── calendar.js           # Tooltip interactions
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                # GitHub Actions CI pipeline
+│       ├── ci.yml                # GitHub Actions CI pipeline
+│       └── release.yml           # Automated release on version tags
 └── README.md
 ```
 
@@ -111,6 +112,19 @@ Tests run without a WordPress installation — the bootstrap file provides light
 ### CI Pipeline
 
 GitHub Actions runs the full test suite on every push and pull request against `main`/`master`. Tests are executed across PHP 7.4, 8.0, 8.1, 8.2, and 8.3.
+
+### Releases
+
+Push a version tag to automatically build and publish a release `.zip` on GitHub:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `wordpress-ical-calendar-1.0.0.zip` and attaches it to a GitHub Release.
+
+Users can download the `.zip` from the [Releases page](../../releases) and install via **Plugins → Add New → Upload Plugin**.
 
 ## Requirements
 

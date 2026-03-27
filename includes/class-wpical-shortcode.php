@@ -32,7 +32,7 @@ class WPIcalShortcode {
         wp_enqueue_style( 'wpical-calendar-style' );
         wp_enqueue_script( 'wpical-calendar-script' );
 
-        $monthsToShow = max( 1, (int) $atts['months'] );
+        $monthsToShow = min( 12, max( 1, (int) $atts['months'] ) );
 
         // Always fetch the next 7 days starting from today.
         $tz         = wp_timezone();
@@ -44,8 +44,12 @@ class WPIcalShortcode {
         $icalBody = WPIcalFetcher::fetch( $feedId );
 
         if ( is_wp_error( $icalBody ) ) {
+            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log( 'wpical_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
+            }
             return '<div class="wpical-error">'
-                . esc_html( $icalBody->get_error_message() )
+                . esc_html__( 'Unable to load calendar. Please try again later.', 'wp-ical-calendar' )
                 . '</div>';
         }
 

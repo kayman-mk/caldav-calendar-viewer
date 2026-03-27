@@ -4,6 +4,7 @@
 .idea
 .distignore
 .phpunit.result.cache
+.wordpress-org
 composer.json
 composer.lock
 phpunit.xml

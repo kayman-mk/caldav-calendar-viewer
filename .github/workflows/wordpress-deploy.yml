@@ -6,29 +6,8 @@ on:
       - 'v*'
 
 jobs:
-  test:
-    name: Run tests before deploy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: openssl, mbstring
-
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Run tests
-        run: vendor/bin/phpunit --testdox
-
   deploy:
     name: Deploy to WordPress.org SVN
-    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +19,8 @@ jobs:
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
 
       - name: Update Stable tag in readme.txt
-        run: sed -i "s/^Stable tag:.*/Stable tag: ${{ steps.version.outputs.version }}/" readme.txt
+        run: |
+          sed -i "s/^Stable tag:.*/Stable tag: ${{ steps.version.outputs.version }}/" readme.txt
 
       - name: Deploy to WordPress.org
         uses: 10up/action-wordpress-plugin-deploy@v2

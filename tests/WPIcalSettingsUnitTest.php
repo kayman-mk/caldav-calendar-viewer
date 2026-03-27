@@ -42,6 +42,25 @@ class WPIcalSettingsUnitTest extends TestCase {
         $this->assertSame( '', $result );
     }
 
+    public function test_should_returnEmptyString_when_decryptingTamperedCiphertext(): void {
+        $encrypted = WPIcalSettings::encrypt( 'sensitive-data' );
+        $this->assertNotEmpty( $encrypted );
+
+        // Tamper with a byte in the middle of the base64-encoded ciphertext.
+        $bytes    = base64_decode( $encrypted );
+        $bytes[0] = $bytes[0] === "\x00" ? "\x01" : "\x00";
+        $tampered = base64_encode( $bytes );
+
+        $result = WPIcalSettings::decrypt( $tampered );
+
+        $this->assertSame( '', $result );
+    }
+
+    public function test_should_returnEmptyString_when_decryptingGarbageInput(): void {
+        $this->assertSame( '', WPIcalSettings::decrypt( 'not-valid-encrypted-data' ) );
+        $this->assertSame( '', WPIcalSettings::decrypt( '!!!' ) );
+    }
+
     /* ------------------------------------------------------------------
      * getAllFeeds
      * ----------------------------------------------------------------*/
@@ -188,6 +207,21 @@ class WPIcalSettingsUnitTest extends TestCase {
         // Password should be encrypted (non-empty, different from plain text).
         $this->assertNotEmpty( $result['my-feed']['password'] );
         $this->assertNotSame( 'secret123', $result['my-feed']['password'] );
+    }
+
+    public function test_should_rejectNonHttpSchemes_when_feedUrlUsesFtp(): void {
+        $settings = new WPIcalSettings();
+        $result   = $settings->sanitizeFeeds( array(
+            array(
+                'id'       => 'evil',
+                'url'      => 'ftp://internal-server/secret.ics',
+                'username' => '',
+                'password' => '',
+            ),
+        ) );
+
+        $this->assertArrayHasKey( 'evil', $result );
+        $this->assertSame( '', $result['evil']['url'] );
     }
 
     public function test_should_keepExistingPassword_when_passwordFieldIsEmpty(): void {

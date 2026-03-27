@@ -45,7 +45,7 @@ jobs:
       - name: Build release zip
         run: |
           mkdir -p build/wordpress-ical-calendar
-          cp -r wordpress-ical-calendar.php includes/ assets/ README.md build/wordpress-ical-calendar/
+          cp -r wordpress-ical-calendar.php includes/ assets/ README.md readme.txt build/wordpress-ical-calendar/
           cd build
           zip -r ../wordpress-ical-calendar-${{ steps.version.outputs.version }}.zip wordpress-ical-calendar/
 

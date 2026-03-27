@@ -335,9 +335,13 @@ class WPIcalSettings {
 
         $key = hash( 'sha256', AUTH_KEY, true );
 
-        return self::decryptAuthenticated( $data, $key )
-            ?? self::decryptLegacy( $data, $key )
-            ?? '';
+        // Data long enough for the authenticated format must pass HMAC verification.
+        // Falling back to legacy on HMAC failure would defeat tamper detection.
+        $result = ( strlen( $data ) >= 49 )
+            ? self::decryptAuthenticated( $data, $key )
+            : self::decryptLegacy( $data, $key );
+
+        return $result ?? '';
     }
 
     /**

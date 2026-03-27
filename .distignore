@@ -1,0 +1,13 @@
+.git
+.github
+.gitignore
+.idea
+.distignore
+.phpunit.result.cache
+composer.json
+composer.lock
+phpunit.xml
+tests
+vendor
+*.iml
+

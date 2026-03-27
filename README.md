@@ -94,7 +94,10 @@ wordpress-ical-calendar/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml                # GitHub Actions CI pipeline
-│       └── release.yml           # Automated release on version tags
+│       ├── release.yml           # Automated release on version tags
+│       └── wordpress-deploy.yml  # Deploy to WordPress.org SVN
+├── .wordpress-org/               # Plugin directory assets (banners, icons)
+├── .distignore                   # Files excluded from WordPress.org deploy
 └── README.md
 ```
 
@@ -125,6 +128,20 @@ git push origin v1.0.0
 The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `wordpress-ical-calendar-1.0.0.zip` and attaches it to a GitHub Release.
 
 Users can download the `.zip` from the [Releases page](../../releases) and install via **Plugins → Add New → Upload Plugin**.
+
+### WordPress.org Deploy
+
+When a version tag is pushed, the deploy workflow also publishes the plugin to the WordPress.org SVN repository.
+
+**Setup (one-time):**
+
+1. Register at [wordpress.org](https://login.wordpress.org/register) and [submit the plugin for review](https://wordpress.org/plugins/developers/add/).
+2. Once approved, add these **repository secrets** in GitHub under **Settings → Secrets and variables → Actions**:
+   - `WORDPRESS_ORG_USERNAME` – your WordPress.org SVN username
+   - `WORDPRESS_ORG_PASSWORD` – your WordPress.org SVN password
+3. Place plugin directory images (banner, icon) in the `.wordpress-org/` folder.
+
+The workflow automatically syncs `readme.txt` (with the correct Stable tag), all runtime files, and `.wordpress-org/` assets to SVN.
 
 ## Requirements
 

@@ -1,5 +1,5 @@
 === WordPress iCal Calendar ===
-Contributors: kaymanmk
+Contributors: kayman-mk
 Tags: ical, calendar, ics, events, shortcode
 Requires at least: 5.6
 Tested up to: 6.7

@@ -84,15 +84,12 @@ class CalDavCVSettings {
             }
 
             $url = isset( $feed['url'] ) ? esc_url_raw( $feed['url'], array( 'http', 'https' ) ) : '';
-            if ( empty( $url ) ) {
-                continue;
-            }
 
             // Keep existing encrypted password when the field is left empty.
             $existing = self::getFeed( $id );
 
             $clean[ $id ] = array(
-                'url'      => $url,
+                'url'      => $url, // will be '' if not http/https
                 'username' => isset( $feed['username'] ) ? sanitize_text_field( $feed['username'] ) : '',
                 'password' => isset( $feed['password'] ) && $feed['password'] !== ''
                     ? self::encrypt( $feed['password'] )

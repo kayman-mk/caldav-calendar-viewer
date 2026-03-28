@@ -275,7 +275,7 @@ class CalDavCVSettings {
                     <input type="password" id="<?php echo esc_attr( $idPrefix . 'password' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[password]' ); ?>"
                            value="" class="regular-text" autocomplete="new-password"
-                           placeholder="<?php echo ! empty( $feed['password'] ) ? '••••••••' : ''; ?>" />
+                           placeholder="<?php echo esc_attr( ! empty( $feed['password'] ) ? '••••••••' : '' ); ?>" />
                     <p class="description"><?php esc_html_e( 'Leave blank to keep the current password. The password is stored encrypted.', 'caldav-calendar-viewer' ); ?></p>
                 </div>
             </div>

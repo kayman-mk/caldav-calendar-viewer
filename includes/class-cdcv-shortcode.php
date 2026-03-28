@@ -85,7 +85,7 @@ class CalDavCVShortcode {
                 ? __( 'Today', 'caldav-calendar-viewer' ) . ' — ' . wp_date( 'l, j F', $dateObj->getTimestamp() )
                 : wp_date( 'l, j F', $dateObj->getTimestamp() );
 
-            echo '<div class="cdcv-day-group' . ( $isToday ? ' cdcv-today' : '' ) . '">';
+            echo '<div class="' . esc_attr( 'cdcv-day-group' . ( $isToday ? ' cdcv-today' : '' ) ) . '">';
             echo '<h3 class="cdcv-day-heading">' . esc_html( $dayLabel ) . '</h3>';
             echo '<ul class="cdcv-event-list">';
 

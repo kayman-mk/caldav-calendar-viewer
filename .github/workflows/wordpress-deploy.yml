@@ -27,7 +27,7 @@ jobs:
         env:
           SVN_USERNAME: ${{ secrets.WORDPRESS_ORG_USERNAME }}
           SVN_PASSWORD: ${{ secrets.WORDPRESS_ORG_PASSWORD }}
-          SLUG: wordpress-ical-calendar
+          SLUG: caldav-calendar-viewer
           VERSION: ${{ steps.version.outputs.version }}
           ASSETS_DIR: .wordpress-org
 

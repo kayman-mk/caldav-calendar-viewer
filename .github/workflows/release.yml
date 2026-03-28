@@ -23,15 +23,15 @@ jobs:
 
       - name: Build release zip
         run: |
-          mkdir -p build/wordpress-ical-calendar
-          cp -r wordpress-ical-calendar.php includes/ assets/ README.md readme.txt build/wordpress-ical-calendar/
+          mkdir -p build/caldav-calendar-viewer
+          cp -r caldav-calendar-viewer.php includes/ assets/ README.md readme.txt build/caldav-calendar-viewer/
           cd build
-          zip -r ../wordpress-ical-calendar-${{ steps.version.outputs.version }}.zip wordpress-ical-calendar/
+          zip -r ../caldav-calendar-viewer-${{ steps.version.outputs.version }}.zip caldav-calendar-viewer/
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           name: v${{ steps.version.outputs.version }}
           generate_release_notes: true
-          files: wordpress-ical-calendar-${{ steps.version.outputs.version }}.zip
+          files: caldav-calendar-viewer-${{ steps.version.outputs.version }}.zip
 

@@ -1,13 +1,13 @@
-/* ICal Calendar View – Front-end Styles */
+/* CalDav Calendar Viewer – Front-end Styles */
 
-.icalcv-calendar,
-.icalcv-calendar *,
-.icalcv-calendar *::before,
-.icalcv-calendar *::after {
+.cdcv-calendar,
+.cdcv-calendar *,
+.cdcv-calendar *::before,
+.cdcv-calendar *::after {
     box-sizing: border-box;
 }
 
-.icalcv-calendar {
+.cdcv-calendar {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     max-width: 720px;
     margin: 0 auto 2rem;
@@ -19,13 +19,13 @@
 }
 
 /* Day group */
-.icalcv-day-group {
+.cdcv-day-group {
     margin-bottom: 1.5rem;
     clear: both;
     overflow: hidden;
 }
 
-.icalcv-day-heading {
+.cdcv-day-heading {
     font-size: 1rem;
     font-weight: 600;
     color: #1d2327;
@@ -36,13 +36,13 @@
     width: auto;
 }
 
-.icalcv-today .icalcv-day-heading {
+.cdcv-today .cdcv-day-heading {
     color: #2271b1;
     border-bottom-color: #2271b1;
 }
 
 /* Event list */
-.icalcv-event-list {
+.cdcv-event-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -51,7 +51,7 @@
     gap: 6px;
 }
 
-.icalcv-event {
+.cdcv-event {
     background: #f0f6fc;
     border-left: 3px solid #2271b1;
     border-right: none;
@@ -68,33 +68,33 @@
     display: block;
 }
 
-.icalcv-event a {
+.cdcv-event a {
     color: #1d2327;
     text-decoration: none;
     display: block;
 }
 
-.icalcv-event a:hover {
+.cdcv-event a:hover {
     text-decoration: underline;
 }
 
-.icalcv-event-time {
+.cdcv-event-time {
     font-weight: 600;
     color: #2271b1;
 }
 
-.icalcv-event-title {
+.cdcv-event-title {
     font-weight: 500;
 }
 
-.icalcv-event-location {
+.cdcv-event-location {
     opacity: 0.7;
     font-style: italic;
 }
 
 /* Error & empty states */
-.icalcv-error,
-.icalcv-no-events {
+.cdcv-error,
+.cdcv-no-events {
     padding: 1rem;
     border-left: 4px solid #d63638;
     background: #fcf0f1;
@@ -104,14 +104,14 @@
     overflow: hidden;
 }
 
-.icalcv-no-events {
+.cdcv-no-events {
     border-left-color: #dba617;
     background: #fcf9e8;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-    .icalcv-event {
+    .cdcv-event {
         font-size: 0.8rem;
         padding: 6px 10px;
     }

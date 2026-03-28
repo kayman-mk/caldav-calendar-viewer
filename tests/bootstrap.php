@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', dirname( __DIR__ ) . '/' );
 }
 
-// WordPress AUTH_KEY used for encryption in ICalCVSettings.
+// WordPress AUTH_KEY used for encryption in CalDavCVSettings.
 if ( ! defined( 'AUTH_KEY' ) ) {
     define( 'AUTH_KEY', 'test-auth-key-for-unit-tests-only' );
 }
@@ -26,28 +26,28 @@ if ( ! defined( 'AUTH_KEY' ) ) {
 /* ------------------------------------------------------------------
  * In-memory option store used by get_option / update_option stubs.
  * ----------------------------------------------------------------*/
-global $icalcv_test_options;
-$icalcv_test_options = array();
+global $cdcv_test_options;
+$cdcv_test_options = array();
 
 if ( ! function_exists( 'get_option' ) ) {
     function get_option( string $key, $default = false ) { // NOSONAR - WordPress API stub
-        global $icalcv_test_options;
-        return array_key_exists( $key, $icalcv_test_options ) ? $icalcv_test_options[ $key ] : $default;
+        global $cdcv_test_options;
+        return array_key_exists( $key, $cdcv_test_options ) ? $cdcv_test_options[ $key ] : $default;
     }
 }
 
 if ( ! function_exists( 'update_option' ) ) {
     function update_option( string $key, $value ): bool { // NOSONAR - WordPress API stub
-        global $icalcv_test_options;
-        $icalcv_test_options[ $key ] = $value;
+        global $cdcv_test_options;
+        $cdcv_test_options[ $key ] = $value;
         return true;
     }
 }
 
 if ( ! function_exists( 'delete_option' ) ) {
     function delete_option( string $key ): bool { // NOSONAR - WordPress API stub
-        global $icalcv_test_options;
-        unset( $icalcv_test_options[ $key ] );
+        global $cdcv_test_options;
+        unset( $cdcv_test_options[ $key ] );
         return true;
     }
 }
@@ -55,20 +55,20 @@ if ( ! function_exists( 'delete_option' ) ) {
 /* ------------------------------------------------------------------
  * In-memory transient store.
  * ----------------------------------------------------------------*/
-global $icalcv_test_transients;
-$icalcv_test_transients = array();
+global $cdcv_test_transients;
+$cdcv_test_transients = array();
 
 if ( ! function_exists( 'get_transient' ) ) {
     function get_transient( string $key ) { // NOSONAR - WordPress API stub
-        global $icalcv_test_transients;
-        return $icalcv_test_transients[ $key ] ?? false;
+        global $cdcv_test_transients;
+        return $cdcv_test_transients[ $key ] ?? false;
     }
 }
 
 if ( ! function_exists( 'set_transient' ) ) {
     function set_transient( string $key, $value, int $expiration = 0 ): bool { // NOSONAR - matches WP API signature
-        global $icalcv_test_transients;
-        $icalcv_test_transients[ $key ] = $value;
+        global $cdcv_test_transients;
+        $cdcv_test_transients[ $key ] = $value;
         return true;
     }
 }
@@ -182,16 +182,16 @@ if ( ! function_exists( 'is_wp_error' ) ) {
 /* ------------------------------------------------------------------
  * HTTP stub (wp_remote_get) — overridable via global callback.
  * ----------------------------------------------------------------*/
-global $icalcv_test_http_response;
-$icalcv_test_http_response = null;
+global $cdcv_test_http_response;
+$cdcv_test_http_response = null;
 
 if ( ! function_exists( 'wp_remote_get' ) ) {
     function wp_remote_get( string $url, array $args = array() ) { // NOSONAR - WordPress API stub
-        global $icalcv_test_http_response;
-        if ( is_callable( $icalcv_test_http_response ) ) {
-            return ( $icalcv_test_http_response )( $url, $args );
+        global $cdcv_test_http_response;
+        if ( is_callable( $cdcv_test_http_response ) ) {
+            return ( $cdcv_test_http_response )( $url, $args );
         }
-        return $icalcv_test_http_response;
+        return $cdcv_test_http_response;
     }
 }
 
@@ -242,8 +242,8 @@ if ( ! function_exists( 'shortcode_atts' ) ) {
 /* ------------------------------------------------------------------
  * Load plugin classes.
  * ----------------------------------------------------------------*/
-require_once dirname( __DIR__ ) . '/includes/class-icalcv-settings.php';
-require_once dirname( __DIR__ ) . '/includes/class-icalcv-fetcher.php';
-require_once dirname( __DIR__ ) . '/includes/class-icalcv-parser.php';
-require_once dirname( __DIR__ ) . '/includes/class-icalcv-shortcode.php';
+require_once dirname( __DIR__ ) . '/includes/class-cdcv-settings.php';
+require_once dirname( __DIR__ ) . '/includes/class-cdcv-fetcher.php';
+require_once dirname( __DIR__ ) . '/includes/class-cdcv-parser.php';
+require_once dirname( __DIR__ ) . '/includes/class-cdcv-shortcode.php';
 

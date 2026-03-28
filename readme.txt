@@ -1,4 +1,4 @@
-=== ICal Calendar View ===
+=== CalDav Calendar Viewer ===
 Contributors: kaymanmk
 Tags: ical, calendar, ics, events, shortcode
 Requires at least: 5.6
@@ -12,7 +12,7 @@ Displays events from iCal (.ics) feeds in a responsive list. Supports recurring 
 
 == Description ==
 
-ICal Calendar View fetches and displays events from any standard iCal (.ics) feed directly on your site using a simple shortcode. It supports multiple calendar feeds, each with its own URL and optional username/password for authenticated endpoints.
+CalDav Calendar Viewer fetches and displays events from any standard iCal (.ics) feed directly on your site using a simple shortcode. It supports multiple calendar feeds, each with its own URL and optional username/password for authenticated endpoints.
 
 **Key Features:**
 
@@ -28,14 +28,14 @@ ICal Calendar View fetches and displays events from any standard iCal (.ics) fee
 
 == Installation ==
 
-1. Upload the `ical-calendar-view` folder to the `/wp-content/plugins/` directory, or install it directly through the WordPress plugin screen.
+1. Upload the `caldav-calendar-viewer` folder to the `/wp-content/plugins/` directory, or install it directly through the WordPress plugin screen.
 2. Activate the plugin through the **Plugins** screen in WordPress.
-3. Go to **Settings → ICal Calendar View** to add your calendar feeds.
-4. Add the `[icalcv_calendar id="your-feed-id"]` shortcode to any page or post.
+3. Go to **Settings → CalDav Calendar Viewer** to add your calendar feeds.
+4. Add the `[cdcv_calendar id="your-feed-id"]` shortcode to any page or post.
 
 == Configuration ==
 
-Navigate to **Settings → ICal Calendar View** in the WordPress admin panel.
+Navigate to **Settings → CalDav Calendar Viewer** in the WordPress admin panel.
 
 = Adding a Feed =
 
@@ -56,17 +56,17 @@ You can configure multiple feeds — each gets its own ID.
 
 = Basic Shortcode =
 
-`[icalcv_calendar id="my-feed"]`
+`[cdcv_calendar id="my-feed"]`
 
 = Shortcode Attributes =
 
-* `id` (required) – The feed ID configured in **Settings → ICal Calendar View**.
+* `id` (required) – The feed ID configured in **Settings → CalDav Calendar Viewer**.
 
 = Examples =
 
-`[icalcv_calendar id="team-calendar"]`
+`[cdcv_calendar id="team-calendar"]`
 
-`[icalcv_calendar id="hr-events"]`
+`[cdcv_calendar id="hr-events"]`
 
 == Frequently Asked Questions ==
 
@@ -82,12 +82,12 @@ Yes. Each feed can be configured with a username and password for HTTP Basic Aut
 
 Yes. Configure multiple feeds in the settings, then use separate shortcodes:
 
-`[icalcv_calendar id="team"]`
-`[icalcv_calendar id="holidays"]`
+`[cdcv_calendar id="team"]`
+`[cdcv_calendar id="holidays"]`
 
 = How often is the calendar data refreshed? =
 
-By default, fetched data is cached for 1 hour (3600 seconds). You can change this in **Settings → ICal Calendar View** under Cache Lifetime. Set to `0` to fetch fresh data on every page load.
+By default, fetched data is cached for 1 hour (3600 seconds). You can change this in **Settings → CalDav Calendar Viewer** under Cache Lifetime. Set to `0` to fetch fresh data on every page load.
 
 = What if OpenSSL is not available? =
 
@@ -95,7 +95,7 @@ The plugin falls back to Base64 encoding for password storage. For production us
 
 = Can I style the calendar? =
 
-Yes. The calendar uses CSS classes prefixed with `icalcv-` that you can override in your theme's stylesheet or via the WordPress Customizer's Additional CSS section.
+Yes. The calendar uses CSS classes prefixed with `cdcv-` that you can override in your theme's stylesheet or via the WordPress Customizer's Additional CSS section.
 
 == Screenshots ==
 
@@ -109,7 +109,7 @@ Yes. The calendar uses CSS classes prefixed with `icalcv-` that you can override
 * Initial release.
 * Multiple iCal feed support with per-feed URL, username, and password.
 * AES-256-CBC encrypted password storage.
-* `[icalcv_calendar]` shortcode with `id` attribute.
+* `[cdcv_calendar]` shortcode with `id` attribute.
 * 7-day event list view.
 * Recurring event (RRULE) expansion — DAILY, WEEKLY, MONTHLY, YEARLY with BYDAY, BYMONTHDAY, INTERVAL, COUNT, UNTIL, and EXDATE.
 * 7-day rolling event fetch window.

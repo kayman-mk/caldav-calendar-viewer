@@ -1,45 +1,45 @@
 <?php
 /**
- * Plugin Name: ICal Calendar View
- * Plugin URI:  https://github.com/kayman-mk/ical-calendar-view
+ * Plugin Name: CalDav Calendar Viewer
+ * Plugin URI:  https://github.com/kayman-mk/caldav-calendar-viewer
  * Description: Displays events from an iCal (.ics) feed in a calendar view. Supports authenticated (username/password) iCal endpoints.
  * Version:     1.0.0
  * Author:      kaymanmk
  * License:     GPL-2.0-or-later
- * Text Domain: ical-calendar-view
+ * Text Domain: caldav-calendar-viewer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'ICALCV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'ICALCV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'ICALCV_VERSION', '1.0.0' );
+define( 'CDCV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'CDCV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'CDCV_VERSION', '1.0.0' );
 
-require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-settings.php';
-require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-fetcher.php';
-require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-parser.php';
-require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-shortcode.php';
+require_once CDCV_PLUGIN_DIR . 'includes/class-cdcv-settings.php';
+require_once CDCV_PLUGIN_DIR . 'includes/class-cdcv-fetcher.php';
+require_once CDCV_PLUGIN_DIR . 'includes/class-cdcv-parser.php';
+require_once CDCV_PLUGIN_DIR . 'includes/class-cdcv-shortcode.php';
 
 /**
  * Holds references to the plugin component instances to prevent garbage collection.
  *
  * @var array<string, object>
  */
-global $icalcv_instances;
-$icalcv_instances = array();
+global $cdcv_instances;
+$cdcv_instances = array();
 
 /**
  * Initialize the plugin components.
  */
-function icalcv_init() {
-    global $icalcv_instances;
+function cdcv_init() {
+    global $cdcv_instances;
 
-    $icalcv_instances['settings']  = new ICalCVSettings();
-    $icalcv_instances['shortcode'] = new ICalCVShortcode();
+    $cdcv_instances['settings']  = new CalDavCVSettings();
+    $cdcv_instances['shortcode'] = new CalDavCVShortcode();
 }
-add_action( 'plugins_loaded', 'icalcv_init' );
+add_action( 'plugins_loaded', 'cdcv_init' );
 
 /**
  * Add a "Settings" link on the Plugins list page.
@@ -47,34 +47,34 @@ add_action( 'plugins_loaded', 'icalcv_init' );
  * @param array $links Existing action links.
  * @return array Modified action links.
  */
-function icalcv_plugin_action_links( array $links ): array {
-    $settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=icalcv-settings' ) ) . '">'
-        . esc_html__( 'Settings', 'ical-calendar-view' )
+function cdcv_plugin_action_links( array $links ): array {
+    $settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=cdcv-settings' ) ) . '">'
+        . esc_html__( 'Settings', 'caldav-calendar-viewer' )
         . '</a>';
 
     array_unshift( $links, $settings_link );
 
     return $links;
 }
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'icalcv_plugin_action_links' );
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'cdcv_plugin_action_links' );
 
 /**
  * Enqueue front-end assets when the shortcode is used.
  */
-function icalcv_enqueue_assets() {
+function cdcv_enqueue_assets() {
     wp_register_style(
-        'icalcv-calendar-style',
-        ICALCV_PLUGIN_URL . 'assets/css/calendar.css',
+        'cdcv-calendar-style',
+        CDCV_PLUGIN_URL . 'assets/css/calendar.css',
         array(),
-        ICALCV_VERSION
+        CDCV_VERSION
     );
     wp_register_script(
-        'icalcv-calendar-script',
-        ICALCV_PLUGIN_URL . 'assets/js/calendar.js',
+        'cdcv-calendar-script',
+        CDCV_PLUGIN_URL . 'assets/js/calendar.js',
         array(),
-        ICALCV_VERSION,
+        CDCV_VERSION,
         true
     );
 }
-add_action( 'wp_enqueue_scripts', 'icalcv_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'cdcv_enqueue_assets' );
 

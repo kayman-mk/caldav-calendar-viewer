@@ -7,10 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class ICalCVFetcher {
+class CalDavCVFetcher {
 
     /** Transient key prefix used for caching. */
-    private const CACHE_KEY = 'icalcv_feed_cache';
+    private const CACHE_KEY = 'cdcv_feed_cache';
 
     /** Maximum allowed response body size in bytes (2 MB). */
     private const MAX_RESPONSE_SIZE = 2 * 1024 * 1024;
@@ -22,7 +22,7 @@ class ICalCVFetcher {
      * using the provided $feedId. Results are cached using WordPress transients
      * according to the configured TTL.
      *
-     * @param string $feedId The feed identifier configured in Settings → ICal Calendar View.
+     * @param string $feedId The feed identifier configured in Settings → CalDav Calendar Viewer.
      * @return string|WP_Error The raw iCal string on success, WP_Error on failure.
      */
     public static function fetch( string $feedId ) {
@@ -31,10 +31,10 @@ class ICalCVFetcher {
             return $validationError;
         }
 
-        $feed     = ICalCVSettings::getFeed( $feedId );
+        $feed     = CalDavCVSettings::getFeed( $feedId );
         $url      = $feed['url'];
         $username = $feed['username'];
-        $password = ICalCVSettings::getFeedPassword( $feedId );
+        $password = CalDavCVSettings::getFeedPassword( $feedId );
 
         $cached = self::getCachedResponse( $feedId, $url );
         if ( null !== $cached ) {
@@ -58,18 +58,18 @@ class ICalCVFetcher {
      */
     private static function validateFeed( string $feedId ): ?WP_Error {
         if ( empty( $feedId ) ) {
-            return new WP_Error( 'icalcv_no_id', __( 'No feed ID provided. Use [icalcv_calendar id="your-feed-id"].', 'ical-calendar-view' ) );
+            return new WP_Error( 'cdcv_no_id', __( 'No feed ID provided. Use [cdcv_calendar id="your-feed-id"].', 'caldav-calendar-viewer' ) );
         }
 
-        $feed = ICalCVSettings::getFeed( $feedId );
+        $feed = CalDavCVSettings::getFeed( $feedId );
 
         if ( null === $feed || empty( $feed['url'] ) ) {
-            $errorCode = ( null === $feed ) ? 'icalcv_unknown_feed' : 'icalcv_no_url';
+            $errorCode = ( null === $feed ) ? 'cdcv_unknown_feed' : 'cdcv_no_url';
             $errorMsg  = ( null === $feed )
                 ? /* translators: %s: feed ID */
-                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → ICal Calendar View.', 'ical-calendar-view' )
+                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → CalDav Calendar Viewer.', 'caldav-calendar-viewer' )
                 : /* translators: %s: feed ID */
-                  __( 'No URL configured for feed "%s".', 'ical-calendar-view' );
+                  __( 'No URL configured for feed "%s".', 'caldav-calendar-viewer' );
 
             return new WP_Error( $errorCode, sprintf( $errorMsg, $feedId ) );
         }
@@ -85,7 +85,7 @@ class ICalCVFetcher {
      * @return string|null Cached body or null if not cached.
      */
     private static function getCachedResponse( string $feedId, string $url ): ?string {
-        $cacheTtl = ICalCVSettings::getCacheTtl();
+        $cacheTtl = CalDavCVSettings::getCacheTtl();
         if ( $cacheTtl <= 0 ) {
             return null;
         }
@@ -104,7 +104,7 @@ class ICalCVFetcher {
      * @param string $body   Response body.
      */
     private static function cacheResponse( string $feedId, string $url, string $body ): void {
-        $cacheTtl = ICalCVSettings::getCacheTtl();
+        $cacheTtl = CalDavCVSettings::getCacheTtl();
         if ( $cacheTtl > 0 ) {
             $cacheKey = self::CACHE_KEY . '_' . md5( $feedId . '|' . $url );
             set_transient( $cacheKey, $body, $cacheTtl );
@@ -141,10 +141,10 @@ class ICalCVFetcher {
         $code = wp_remote_retrieve_response_code( $response );
         if ( $code < 200 || $code >= 300 ) {
             return new WP_Error(
-                'icalcv_http_error',
+                'cdcv_http_error',
                 sprintf(
                     /* translators: %d: HTTP status code */
-                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'ical-calendar-view' ),
+                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'caldav-calendar-viewer' ),
                     $code
                 )
             );

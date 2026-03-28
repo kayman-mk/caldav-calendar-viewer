@@ -1,5 +1,5 @@
 {
-    "name": "kayman-mk/ical-calendar-view",
+    "name": "kayman-mk/caldav-calendar-viewer",
     "description": "WordPress plugin that displays events from iCal feeds",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",

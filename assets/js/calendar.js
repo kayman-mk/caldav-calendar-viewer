@@ -1,5 +1,5 @@
 /**
- * ICal Calendar View – Front-end JavaScript.
+ * CalDav Calendar Viewer – Front-end JavaScript.
  *
  * Adds interactive tooltips for calendar events on hover.
  */
@@ -14,11 +14,11 @@
         }
 
         // Prevent default browser tooltip.
-        event.currentTarget.dataset.icalcvTitle = title;
+        event.currentTarget.dataset.cdcvTitle = title;
         event.currentTarget.removeAttribute('title');
 
         var tooltip = document.createElement('div');
-        tooltip.className = 'icalcv-tooltip';
+        tooltip.className = 'cdcv-tooltip';
         tooltip.textContent = title;
         document.body.appendChild(tooltip);
 
@@ -26,37 +26,37 @@
         tooltip.style.top = (window.scrollY + rect.bottom + 6) + 'px';
         tooltip.style.left = (window.scrollX + rect.left) + 'px';
 
-        event.currentTarget._icalcvTooltip = tooltip;
+        event.currentTarget._cdcvTooltip = tooltip;
     }
 
     /** Remove the tooltip element. */
     function hideTooltip(event) {
         var el = event.currentTarget;
-        if (el._icalcvTooltip) {
-            el._icalcvTooltip.remove();
-            delete el._icalcvTooltip;
+        if (el._cdcvTooltip) {
+            el._cdcvTooltip.remove();
+            delete el._cdcvTooltip;
         }
         // Restore title attribute.
-        if (el.dataset.icalcvTitle) {
-            el.setAttribute('title', el.dataset.icalcvTitle);
-            delete el.dataset.icalcvTitle;
+        if (el.dataset.cdcvTitle) {
+            el.setAttribute('title', el.dataset.cdcvTitle);
+            delete el.dataset.cdcvTitle;
         }
     }
 
     /** Bind listeners once the DOM is ready. */
     function init() {
-        var events = document.querySelectorAll('.icalcv-event[title]');
+        var events = document.querySelectorAll('.cdcv-event[title]');
         for (var i = 0; i < events.length; i++) {
             events[i].addEventListener('mouseenter', showTooltip);
             events[i].addEventListener('mouseleave', hideTooltip);
         }
 
         // Inject tooltip styles once.
-        if (!document.getElementById('icalcv-tooltip-style')) {
+        if (!document.getElementById('cdcv-tooltip-style')) {
             var style = document.createElement('style');
-            style.id = 'icalcv-tooltip-style';
+            style.id = 'cdcv-tooltip-style';
             style.textContent =
-                '.icalcv-tooltip {' +
+                '.cdcv-tooltip {' +
                 '  position: absolute;' +
                 '  z-index: 100000;' +
                 '  max-width: 280px;' +

@@ -1,4 +1,4 @@
-# ICal Calendar View
+# CalDav Calendar Viewer
 
 A WordPress plugin that displays events from iCal (.ics) feeds in a clean 7-day event list. Supports multiple feeds with configurable username and password per feed.
 
@@ -10,7 +10,7 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean 7-day 
 - **Basic Authentication** – Supports username/password per feed for protected calendar endpoints.
 - **Encrypted Credentials** – Passwords are stored encrypted (AES-256-CBC) in the database.
 - **Caching** – Configurable cache lifetime to reduce external requests (defaults to 1 hour).
-- **Shortcode** – Display any feed anywhere via `[icalcv_calendar id="my-feed"]`.
+- **Shortcode** – Display any feed anywhere via `[cdcv_calendar id="my-feed"]`.
 - **7-Day Window** – Always fetches and displays only the next 7 days of events.
 - **Responsive Design** – Clean event list adapts to mobile screens.
 - **Tooltips** – Hover over events to see their description.
@@ -20,14 +20,14 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean 7-day 
 1. Download or clone this repository into your WordPress `wp-content/plugins/` directory:
    ```bash
    cd wp-content/plugins/
-   git clone <repository-url> ical-calendar-view
+   git clone <repository-url> caldav-calendar-viewer
    ```
 2. Activate the plugin via **Plugins → Installed Plugins** in the WordPress admin.
-3. Navigate to **Settings → ICal Calendar View** to configure your feeds.
+3. Navigate to **Settings → CalDav Calendar Viewer** to configure your feeds.
 
 ## Configuration
 
-Go to **Settings → ICal Calendar View** in the WordPress admin panel.
+Go to **Settings → CalDav Calendar Viewer** in the WordPress admin panel.
 
 ### Adding a Feed
 
@@ -55,37 +55,37 @@ You can add multiple feeds — each one gets its own ID.
 Reference a configured feed by its ID:
 
 ```
-[icalcv_calendar id="my-feed"]
+[cdcv_calendar id="my-feed"]
 ```
 
 ### Shortcode Attributes
 
 | Attribute | Required | Default | Description                                       |
 |-----------|----------|---------|---------------------------------------------------|
-| `id`      | **yes**  | —       | The feed ID configured in Settings → ICal Calendar View. |
+| `id`      | **yes**  | —       | The feed ID configured in Settings → CalDav Calendar Viewer. |
 
 **Examples:**
 
 ```
-[icalcv_calendar id="team-calendar"]
-[icalcv_calendar id="hr-events"]
+[cdcv_calendar id="team-calendar"]
+[cdcv_calendar id="hr-events"]
 ```
 
 ## File Structure
 
 ```
-ical-calendar-view/
-├── ical-calendar-view.php   # Main plugin bootstrap
+caldav-calendar-viewer/
+├── caldav-calendar-viewer.php   # Main plugin bootstrap
 ├── includes/
-│   ├── class-icalcv-settings.php # Admin settings page (multi-feed) & encryption helpers
-│   ├── class-icalcv-fetcher.php  # HTTP fetcher with auth & caching (by feed ID)
-│   ├── class-icalcv-parser.php   # iCal RFC 5545 parser with date-range filtering
-│   └── class-icalcv-shortcode.php# [icalcv_calendar] shortcode renderer
+│   ├── class-cdcv-settings.php # Admin settings page (multi-feed) & encryption helpers
+│   ├── class-cdcv-fetcher.php  # HTTP fetcher with auth & caching (by feed ID)
+│   ├── class-cdcv-parser.php   # iCal RFC 5545 parser with date-range filtering
+│   └── class-cdcv-shortcode.php# [cdcv_calendar] shortcode renderer
 ├── tests/
 │   ├── bootstrap.php             # WP function stubs for standalone testing
-│   ├── ICalCVParserUnitTest.php  # Parser unit tests
-│   ├── ICalCVSettingsUnitTest.php# Settings unit tests
-│   └── ICalCVFetcherUnitTest.php # Fetcher unit tests
+│   ├── CalDavCVParserUnitTest.php  # Parser unit tests
+│   ├── CalDavCVSettingsUnitTest.php# Settings unit tests
+│   └── CalDavCVFetcherUnitTest.php # Fetcher unit tests
 ├── assets/
 │   ├── css/
 │   │   └── calendar.css          # Front-end calendar styles
@@ -125,7 +125,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `ical-calendar-view-1.0.0.zip` and attaches it to a GitHub Release.
+The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `caldav-calendar-viewer-1.0.0.zip` and attaches it to a GitHub Release.
 
 Users can download the `.zip` from the [Releases page](../../releases) and install via **Plugins → Add New → Upload Plugin**.
 

@@ -1,23 +1,23 @@
 <?php
 /**
- * Registers the [icalcv_calendar] shortcode and renders an event list.
+ * Registers the [cdcv_calendar] shortcode and renders an event list.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class ICalCVShortcode {
+class CalDavCVShortcode {
 
     public function __construct() {
-        add_shortcode( 'icalcv_calendar', array( $this, 'render' ) );
+        add_shortcode( 'cdcv_calendar', array( $this, 'render' ) );
     }
 
     /**
-     * Shortcode handler for [icalcv_calendar].
+     * Shortcode handler for [cdcv_calendar].
      *
      * Attributes:
-     *   id – references a feed configured in Settings → ICal Calendar View (required)
+     *   id – references a feed configured in Settings → CalDav Calendar Viewer (required)
      *
      * @param array|string $atts Shortcode attributes.
      * @return string HTML output.
@@ -25,10 +25,10 @@ class ICalCVShortcode {
     public function render( $atts ): string {
         $atts = shortcode_atts( array(
             'id' => '',
-        ), $atts, 'icalcv_calendar' );
+        ), $atts, 'cdcv_calendar' );
 
-        wp_enqueue_style( 'icalcv-calendar-style' );
-        wp_enqueue_script( 'icalcv-calendar-script' );
+        wp_enqueue_style( 'cdcv-calendar-style' );
+        wp_enqueue_script( 'cdcv-calendar-script' );
 
         $tz         = wp_timezone();
         $today      = new DateTimeImmutable( 'today', $tz );
@@ -36,23 +36,23 @@ class ICalCVShortcode {
         $rangeEnd   = $today->modify( '+7 days' )->format( 'Y-m-d' );
 
         $feedId   = sanitize_key( $atts['id'] );
-        $icalBody = ICalCVFetcher::fetch( $feedId );
+        $icalBody = CalDavCVFetcher::fetch( $feedId );
 
         if ( is_wp_error( $icalBody ) ) {
             if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
                 // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-                error_log( 'icalcv_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
+                error_log( 'cdcv_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
             }
-            return '<div class="icalcv-error">'
-                . esc_html__( 'Unable to load calendar. Please try again later.', 'ical-calendar-view' )
+            return '<div class="cdcv-error">'
+                . esc_html__( 'Unable to load calendar. Please try again later.', 'caldav-calendar-viewer' )
                 . '</div>';
         }
 
-        $events = ICalCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
+        $events = CalDavCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
 
         if ( empty( $events ) ) {
-            return '<div class="icalcv-no-events">'
-                . esc_html__( 'No upcoming events found.', 'ical-calendar-view' )
+            return '<div class="cdcv-no-events">'
+                . esc_html__( 'No upcoming events found.', 'caldav-calendar-viewer' )
                 . '</div>';
         }
 
@@ -62,7 +62,7 @@ class ICalCVShortcode {
     /**
      * Build an event list grouped by date for the next 7 days.
      *
-     * @param array $events Parsed events from ICalCVParser.
+     * @param array $events Parsed events from CalDavCVParser.
      * @return string HTML markup.
      */
     private function buildEventListHtml( array $events ): string {
@@ -76,18 +76,18 @@ class ICalCVShortcode {
         $today = new DateTimeImmutable( 'today', $tz );
 
         ob_start();
-        echo '<div class="icalcv-calendar">';
+        echo '<div class="cdcv-calendar">';
 
         foreach ( $eventsByDate as $dateStr => $dayEvents ) {
             $dateObj  = new DateTimeImmutable( $dateStr, $tz );
             $isToday  = ( $dateStr === $today->format( 'Y-m-d' ) );
             $dayLabel = $isToday
-                ? __( 'Today', 'ical-calendar-view' ) . ' — ' . wp_date( 'l, j F', $dateObj->getTimestamp() )
+                ? __( 'Today', 'caldav-calendar-viewer' ) . ' — ' . wp_date( 'l, j F', $dateObj->getTimestamp() )
                 : wp_date( 'l, j F', $dateObj->getTimestamp() );
 
-            echo '<div class="icalcv-day-group' . ( $isToday ? ' icalcv-today' : '' ) . '">';
-            echo '<h3 class="icalcv-day-heading">' . esc_html( $dayLabel ) . '</h3>';
-            echo '<ul class="icalcv-event-list">';
+            echo '<div class="cdcv-day-group' . ( $isToday ? ' cdcv-today' : '' ) . '">';
+            echo '<h3 class="cdcv-day-heading">' . esc_html( $dayLabel ) . '</h3>';
+            echo '<ul class="cdcv-event-list">';
 
             foreach ( $dayEvents as $ev ) {
                 $this->renderEventItem( $ev );
@@ -115,19 +115,19 @@ class ICalCVShortcode {
 
         $tooltip = $this->buildTooltip( $ev );
 
-        echo '<li class="icalcv-event" title="' . esc_attr( $tooltip ) . '">';
+        echo '<li class="cdcv-event" title="' . esc_attr( $tooltip ) . '">';
 
         if ( ! empty( $ev['url'] ) ) {
             echo '<a href="' . esc_url( $ev['url'] ) . '" target="_blank" rel="noopener">';
         }
 
         if ( $time ) {
-            echo '<span class="icalcv-event-time">' . esc_html( $time ) . '</span> ';
+            echo '<span class="cdcv-event-time">' . esc_html( $time ) . '</span> ';
         }
-        echo '<span class="icalcv-event-title">' . esc_html( $ev['summary'] ) . '</span>';
+        echo '<span class="cdcv-event-title">' . esc_html( $ev['summary'] ) . '</span>';
 
         if ( ! empty( $ev['location'] ) ) {
-            echo '<span class="icalcv-event-location"> — ' . esc_html( $ev['location'] ) . '</span>';
+            echo '<span class="cdcv-event-location"> — ' . esc_html( $ev['location'] ) . '</span>';
         }
 
         if ( ! empty( $ev['url'] ) ) {
@@ -147,7 +147,7 @@ class ICalCVShortcode {
         $parts = array();
 
         if ( $ev['all_day'] ) {
-            $parts[] = __( 'All day', 'ical-calendar-view' );
+            $parts[] = __( 'All day', 'caldav-calendar-viewer' );
         } elseif ( strlen( $ev['dtstart'] ) > 10 ) {
             $start = substr( $ev['dtstart'], 11 );
             $end   = ( ! empty( $ev['dtend'] ) && strlen( $ev['dtend'] ) > 10 )

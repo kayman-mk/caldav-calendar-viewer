@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class ICalCVParser {
+class CalDavCVParser {
 
     /** Safety limit for generated recurrence instances per event. */
     private const MAX_RECURRENCE_INSTANCES = 730;

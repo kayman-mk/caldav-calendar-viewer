@@ -1,11 +1,12 @@
 # ICal Calendar View
 
-A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthly calendar view. Supports multiple feeds with configurable username and password per feed.
+A WordPress plugin that displays events from iCal (.ics) feeds in a clean 7-day event list. Supports multiple feeds with configurable username and password per feed.
 
 ## Features
 
 - **Multiple Calendar Feeds** – Configure as many iCal feeds as you need, each with a unique ID.
 - **iCal Feed Integration** – Fetches and parses any standard `.ics` calendar feed (RFC 5545).
+- **Recurring Events** – Expands RRULE recurrences (DAILY, WEEKLY, MONTHLY, YEARLY) including BYDAY, BYMONTHDAY, INTERVAL, COUNT, UNTIL, and EXDATE.
 - **Basic Authentication** – Supports username/password per feed for protected calendar endpoints.
 - **Encrypted Credentials** – Passwords are stored encrypted (AES-256-CBC) in the database.
 - **Caching** – Configurable cache lifetime to reduce external requests (defaults to 1 hour).

@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Displays events from iCal (.ics) feeds in a responsive monthly calendar view. Supports multiple feeds with Basic Auth and encrypted credentials.
+Displays events from iCal (.ics) feeds in a responsive 7-day event list. Supports recurring events, multiple feeds with Basic Auth and encrypted credentials.
 
 == Description ==
 
@@ -18,6 +18,7 @@ ICal Calendar View fetches and displays events from any standard iCal (.ics) fee
 
 * **Multiple Calendar Feeds** – Configure as many feeds as you need, each with a unique ID.
 * **iCal / RFC 5545 Support** – Parses standard `.ics` calendar feeds including all-day events, times, locations, and descriptions.
+* **Recurring Events** – Expands RRULE recurrences (DAILY, WEEKLY, MONTHLY, YEARLY) including BYDAY, BYMONTHDAY, INTERVAL, COUNT, UNTIL, and EXDATE.
 * **Basic Authentication** – Supply a username and password per feed for protected calendars.
 * **Encrypted Credentials** – Passwords are stored using AES-256-CBC encryption in the database.
 * **Caching** – Configurable cache lifetime reduces external HTTP requests (defaults to 1 hour).
@@ -110,6 +111,7 @@ Yes. The calendar uses CSS classes prefixed with `icalcv-` that you can override
 * AES-256-CBC encrypted password storage.
 * `[icalcv_calendar]` shortcode with `id` attribute.
 * 7-day event list view.
+* Recurring event (RRULE) expansion — DAILY, WEEKLY, MONTHLY, YEARLY with BYDAY, BYMONTHDAY, INTERVAL, COUNT, UNTIL, and EXDATE.
 * 7-day rolling event fetch window.
 * Configurable transient cache.
 * Event tooltips on hover.

@@ -113,7 +113,9 @@ class ICalCVShortcode {
             $time = substr( $ev['dtstart'], 11 );
         }
 
-        echo '<li class="icalcv-event" title="' . esc_attr( wp_strip_all_tags( $ev['description'] ) ) . '">';
+        $tooltip = $this->buildTooltip( $ev );
+
+        echo '<li class="icalcv-event" title="' . esc_attr( $tooltip ) . '">';
 
         if ( ! empty( $ev['url'] ) ) {
             echo '<a href="' . esc_url( $ev['url'] ) . '" target="_blank" rel="noopener">';
@@ -133,6 +135,33 @@ class ICalCVShortcode {
         }
 
         echo '</li>';
+    }
+
+    /**
+     * Build tooltip text showing start/end time and description.
+     *
+     * @param array $ev Parsed event data.
+     * @return string Plain-text tooltip.
+     */
+    private function buildTooltip( array $ev ): string {
+        $parts = array();
+
+        if ( $ev['all_day'] ) {
+            $parts[] = __( 'All day', 'ical-calendar-view' );
+        } elseif ( strlen( $ev['dtstart'] ) > 10 ) {
+            $start = substr( $ev['dtstart'], 11 );
+            $end   = ( ! empty( $ev['dtend'] ) && strlen( $ev['dtend'] ) > 10 )
+                ? substr( $ev['dtend'], 11 )
+                : '';
+            $parts[] = $end ? $start . ' – ' . $end : $start;
+        }
+
+        $desc = trim( wp_strip_all_tags( $ev['description'] ) );
+        if ( '' !== $desc ) {
+            $parts[] = $desc;
+        }
+
+        return implode( "\n", $parts );
     }
 }
 

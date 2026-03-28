@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Displays events from iCal (.ics) feeds in a responsive 7-day event list. Supports recurring events, multiple feeds with Basic Auth and encrypted credentials.
+Displays events from iCal (.ics) feeds in a responsive list. Supports recurring events, multiple feeds with Basic Auth and encrypted credentials.
 
 == Description ==
 

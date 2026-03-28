@@ -58,7 +58,7 @@ class ICalCVFetcher {
      */
     private static function validateFeed( string $feedId ): ?WP_Error {
         if ( empty( $feedId ) ) {
-            return new WP_Error( 'icalcv_no_id', __( 'No feed ID provided. Use [icalcv_calendar id="your-feed-id"].', 'ical-calendar-view' ) );
+            return new WP_Error( 'icalcv_no_id', __( 'No feed ID provided. Use [icalcv_calendar id="your-feed-id"].', 'wordpress-ical-calendar' ) );
         }
 
         $feed = ICalCVSettings::getFeed( $feedId );
@@ -67,9 +67,9 @@ class ICalCVFetcher {
             $errorCode = ( null === $feed ) ? 'icalcv_unknown_feed' : 'icalcv_no_url';
             $errorMsg  = ( null === $feed )
                 ? /* translators: %s: feed ID */
-                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → ICal Calendar View.', 'ical-calendar-view' )
+                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → ICal Calendar View.', 'wordpress-ical-calendar' )
                 : /* translators: %s: feed ID */
-                  __( 'No URL configured for feed "%s".', 'ical-calendar-view' );
+                  __( 'No URL configured for feed "%s".', 'wordpress-ical-calendar' );
 
             return new WP_Error( $errorCode, sprintf( $errorMsg, $feedId ) );
         }
@@ -144,7 +144,7 @@ class ICalCVFetcher {
                 'icalcv_http_error',
                 sprintf(
                     /* translators: %d: HTTP status code */
-                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'ical-calendar-view' ),
+                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'wordpress-ical-calendar' ),
                     $code
                 )
             );

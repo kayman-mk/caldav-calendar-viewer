@@ -49,7 +49,7 @@ class ICalCVShortcode {
                 error_log( 'icalcv_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
             }
             return '<div class="icalcv-error">'
-                . esc_html__( 'Unable to load calendar. Please try again later.', 'ical-calendar-view' )
+                . esc_html__( 'Unable to load calendar. Please try again later.', 'wordpress-ical-calendar' )
                 . '</div>';
         }
 
@@ -57,7 +57,7 @@ class ICalCVShortcode {
 
         if ( empty( $events ) ) {
             return '<div class="icalcv-no-events">'
-                . esc_html__( 'No upcoming events found.', 'ical-calendar-view' )
+                . esc_html__( 'No upcoming events found.', 'wordpress-ical-calendar' )
                 . '</div>';
         }
 
@@ -118,13 +118,13 @@ class ICalCVShortcode {
      */
     private function renderMonthHeader( string $monthLabel ): void {
         $weekdays = array(
-            __( 'Mon', 'ical-calendar-view' ),
-            __( 'Tue', 'ical-calendar-view' ),
-            __( 'Wed', 'ical-calendar-view' ),
-            __( 'Thu', 'ical-calendar-view' ),
-            __( 'Fri', 'ical-calendar-view' ),
-            __( 'Sat', 'ical-calendar-view' ),
-            __( 'Sun', 'ical-calendar-view' ),
+            __( 'Mon', 'wordpress-ical-calendar' ),
+            __( 'Tue', 'wordpress-ical-calendar' ),
+            __( 'Wed', 'wordpress-ical-calendar' ),
+            __( 'Thu', 'wordpress-ical-calendar' ),
+            __( 'Fri', 'wordpress-ical-calendar' ),
+            __( 'Sat', 'wordpress-ical-calendar' ),
+            __( 'Sun', 'wordpress-ical-calendar' ),
         );
         ?>
         <div class="icalcv-month">

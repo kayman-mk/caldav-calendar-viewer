@@ -6,7 +6,7 @@
  * Version:     1.0.0
  * Author:      kayman-mk
  * License:     GPL-2.0-or-later
- * Text Domain: ical-calendar-view
+ * Text Domain: wordpress-ical-calendar
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,7 +49,7 @@ add_action( 'plugins_loaded', 'icalcv_init' );
  */
 function icalcv_plugin_action_links( array $links ): array {
     $settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=icalcv-settings' ) ) . '">'
-        . esc_html__( 'Settings', 'ical-calendar-view' )
+        . esc_html__( 'Settings', 'wordpress-ical-calendar' )
         . '</a>';
 
     array_unshift( $links, $settings_link );

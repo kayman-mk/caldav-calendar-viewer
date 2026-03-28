@@ -19,7 +19,7 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthl
 1. Download or clone this repository into your WordPress `wp-content/plugins/` directory:
    ```bash
    cd wp-content/plugins/
-   git clone <repository-url> wordpress-ical-calendar
+   git clone <repository-url> ical-calendar-view
    ```
 2. Activate the plugin via **Plugins → Installed Plugins** in the WordPress admin.
 3. Navigate to **Settings → ICal Calendar View** to configure your feeds.
@@ -74,8 +74,8 @@ Reference a configured feed by its ID:
 ## File Structure
 
 ```
-wordpress-ical-calendar/
-├── wordpress-ical-calendar.php   # Main plugin bootstrap
+ical-calendar-view/
+├── ical-calendar-view.php   # Main plugin bootstrap
 ├── includes/
 │   ├── class-icalcv-settings.php # Admin settings page (multi-feed) & encryption helpers
 │   ├── class-icalcv-fetcher.php  # HTTP fetcher with auth & caching (by feed ID)
@@ -125,7 +125,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `wordpress-ical-calendar-1.0.0.zip` and attaches it to a GitHub Release.
+The release workflow runs tests first, then packages only the runtime files (no tests, dev config, or vendor directory) into `ical-calendar-view-1.0.0.zip` and attaches it to a GitHub Release.
 
 Users can download the `.zip` from the [Releases page](../../releases) and install via **Plugins → Add New → Upload Plugin**.
 

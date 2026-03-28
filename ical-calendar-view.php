@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name: ICal Calendar View
- * Plugin URI:  https://github.com/kayman-mk/wordpress-ical-calendar
+ * Plugin URI:  https://github.com/kayman-mk/ical-calendar-view
  * Description: Displays events from an iCal (.ics) feed in a calendar view. Supports authenticated (username/password) iCal endpoints.
  * Version:     1.0.0
  * Author:      kayman-mk
  * License:     GPL-2.0-or-later
- * Text Domain: wordpress-ical-calendar
+ * Text Domain: ical-calendar-view
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,7 +49,7 @@ add_action( 'plugins_loaded', 'icalcv_init' );
  */
 function icalcv_plugin_action_links( array $links ): array {
     $settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=icalcv-settings' ) ) . '">'
-        . esc_html__( 'Settings', 'wordpress-ical-calendar' )
+        . esc_html__( 'Settings', 'ical-calendar-view' )
         . '</a>';
 
     array_unshift( $links, $settings_link );

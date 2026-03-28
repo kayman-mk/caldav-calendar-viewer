@@ -27,7 +27,7 @@ ICal Calendar View fetches and displays events from any standard iCal (.ics) fee
 
 == Installation ==
 
-1. Upload the `wordpress-ical-calendar` folder to the `/wp-content/plugins/` directory, or install it directly through the WordPress plugin screen.
+1. Upload the `ical-calendar-view` folder to the `/wp-content/plugins/` directory, or install it directly through the WordPress plugin screen.
 2. Activate the plugin through the **Plugins** screen in WordPress.
 3. Go to **Settings → ICal Calendar View** to add your calendar feeds.
 4. Add the `[icalcv_calendar id="your-feed-id"]` shortcode to any page or post.

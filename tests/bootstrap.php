@@ -4,7 +4,14 @@
  *
  * Provides lightweight stubs for WordPress functions and constants so plugin
  * classes can be loaded and tested without a full WordPress installation.
+ *
+ * Note: All stubs below intentionally use WordPress's snake_case naming,
+ * unused parameters and empty bodies to match the WordPress API contract.
+ *
+ * @SuppressWarnings(PHPMD)
  */
+
+// phpcs:disable WordPress.NamingConventions, Generic.CodeAnalysis.UnusedFunctionParameter
 
 // Prevent the ABSPATH guard from exiting.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,14 +30,14 @@ global $wpical_test_options;
 $wpical_test_options = array();
 
 if ( ! function_exists( 'get_option' ) ) {
-    function get_option( string $key, $default = false ) {
+    function get_option( string $key, $default = false ) { // NOSONAR - WordPress API stub
         global $wpical_test_options;
         return array_key_exists( $key, $wpical_test_options ) ? $wpical_test_options[ $key ] : $default;
     }
 }
 
 if ( ! function_exists( 'update_option' ) ) {
-    function update_option( string $key, $value ): bool {
+    function update_option( string $key, $value ): bool { // NOSONAR - WordPress API stub
         global $wpical_test_options;
         $wpical_test_options[ $key ] = $value;
         return true;
@@ -38,7 +45,7 @@ if ( ! function_exists( 'update_option' ) ) {
 }
 
 if ( ! function_exists( 'delete_option' ) ) {
-    function delete_option( string $key ): bool {
+    function delete_option( string $key ): bool { // NOSONAR - WordPress API stub
         global $wpical_test_options;
         unset( $wpical_test_options[ $key ] );
         return true;
@@ -52,14 +59,14 @@ global $wpical_test_transients;
 $wpical_test_transients = array();
 
 if ( ! function_exists( 'get_transient' ) ) {
-    function get_transient( string $key ) {
+    function get_transient( string $key ) { // NOSONAR - WordPress API stub
         global $wpical_test_transients;
         return $wpical_test_transients[ $key ] ?? false;
     }
 }
 
 if ( ! function_exists( 'set_transient' ) ) {
-    function set_transient( string $key, $value, int $expiration = 0 ): bool {
+    function set_transient( string $key, $value, int $expiration = 0 ): bool { // NOSONAR - matches WP API signature
         global $wpical_test_transients;
         $wpical_test_transients[ $key ] = $value;
         return true;
@@ -70,67 +77,74 @@ if ( ! function_exists( 'set_transient' ) ) {
  * Text / i18n stubs.
  * ----------------------------------------------------------------*/
 if ( ! function_exists( '__' ) ) {
-    function __( string $text, string $domain = 'default' ): string {
+    function __( string $text, string $domain = 'default' ): string { // NOSONAR - matches WP API signature
         return $text;
     }
 }
 
 if ( ! function_exists( 'esc_html' ) ) {
-    function esc_html( string $text ): string {
+    function esc_html( string $text ): string { // NOSONAR - WordPress API stub
         return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
     }
 }
 
 if ( ! function_exists( 'esc_html__' ) ) {
-    function esc_html__( string $text, string $domain = 'default' ): string {
+    function esc_html__( string $text, string $domain = 'default' ): string { // NOSONAR - WordPress API stub
         return esc_html( $text );
     }
 }
 
 if ( ! function_exists( 'esc_attr' ) ) {
-    function esc_attr( string $text ): string {
+    function esc_attr( string $text ): string { // NOSONAR - WordPress API stub
         return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
     }
 }
 
 if ( ! function_exists( 'esc_url' ) ) {
-    function esc_url( string $url ): string {
+    function esc_url( string $url ): string { // NOSONAR - WordPress API stub
         return filter_var( $url, FILTER_SANITIZE_URL ) ?: '';
     }
 }
 
 if ( ! function_exists( 'esc_url_raw' ) ) {
-    function esc_url_raw( string $url ): string {
-        return filter_var( $url, FILTER_SANITIZE_URL ) ?: '';
+    function esc_url_raw( string $url, array $protocols = null ): string { // NOSONAR - WordPress API stub
+        $sanitized = filter_var( $url, FILTER_SANITIZE_URL ) ?: '';
+        if ( ! empty( $protocols ) && ! empty( $sanitized ) ) {
+            $scheme = parse_url( $sanitized, PHP_URL_SCHEME );
+            if ( $scheme && ! in_array( strtolower( $scheme ), $protocols, true ) ) {
+                return '';
+            }
+        }
+        return $sanitized;
     }
 }
 
 if ( ! function_exists( 'sanitize_key' ) ) {
-    function sanitize_key( string $key ): string {
+    function sanitize_key( string $key ): string { // NOSONAR - WordPress API stub
         return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( $key ) );
     }
 }
 
 if ( ! function_exists( 'sanitize_text_field' ) ) {
-    function sanitize_text_field( string $str ): string {
+    function sanitize_text_field( string $str ): string { // NOSONAR - WordPress API stub
         return trim( strip_tags( $str ) );
     }
 }
 
 if ( ! function_exists( 'wp_strip_all_tags' ) ) {
-    function wp_strip_all_tags( string $text ): string {
+    function wp_strip_all_tags( string $text ): string { // NOSONAR - WordPress API stub
         return strip_tags( $text );
     }
 }
 
 if ( ! function_exists( 'wp_timezone' ) ) {
-    function wp_timezone(): DateTimeZone {
+    function wp_timezone(): DateTimeZone { // NOSONAR - WordPress API stub
         return new DateTimeZone( 'UTC' );
     }
 }
 
 if ( ! function_exists( 'wp_date' ) ) {
-    function wp_date( string $format, int $timestamp = 0 ): string {
+    function wp_date( string $format, int $timestamp = 0 ): string { // NOSONAR - WordPress API stub
         $dt = new DateTimeImmutable( '@' . $timestamp );
         return $dt->format( $format );
     }
@@ -140,7 +154,7 @@ if ( ! function_exists( 'wp_date' ) ) {
  * WP_Error stub.
  * ----------------------------------------------------------------*/
 if ( ! class_exists( 'WP_Error' ) ) {
-    class WP_Error {
+    class WP_Error { // NOSONAR - WordPress API stub
         private string $code;
         private string $message;
 
@@ -149,18 +163,18 @@ if ( ! class_exists( 'WP_Error' ) ) {
             $this->message = $message;
         }
 
-        public function get_error_code(): string {
+        public function get_error_code(): string { // NOSONAR - WordPress API stub
             return $this->code;
         }
 
-        public function get_error_message(): string {
+        public function get_error_message(): string { // NOSONAR - WordPress API stub
             return $this->message;
         }
     }
 }
 
 if ( ! function_exists( 'is_wp_error' ) ) {
-    function is_wp_error( $thing ): bool {
+    function is_wp_error( $thing ): bool { // NOSONAR - WordPress API stub
         return $thing instanceof WP_Error;
     }
 }
@@ -172,7 +186,7 @@ global $wpical_test_http_response;
 $wpical_test_http_response = null;
 
 if ( ! function_exists( 'wp_remote_get' ) ) {
-    function wp_remote_get( string $url, array $args = array() ) {
+    function wp_remote_get( string $url, array $args = array() ) { // NOSONAR - WordPress API stub
         global $wpical_test_http_response;
         if ( is_callable( $wpical_test_http_response ) ) {
             return ( $wpical_test_http_response )( $url, $args );
@@ -182,13 +196,13 @@ if ( ! function_exists( 'wp_remote_get' ) ) {
 }
 
 if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
-    function wp_remote_retrieve_response_code( $response ): int {
+    function wp_remote_retrieve_response_code( $response ): int { // NOSONAR - WordPress API stub
         return $response['response']['code'] ?? 0;
     }
 }
 
 if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
-    function wp_remote_retrieve_body( $response ): string {
+    function wp_remote_retrieve_body( $response ): string { // NOSONAR - WordPress API stub
         return $response['body'] ?? '';
     }
 }
@@ -197,23 +211,23 @@ if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
  * Hook stubs (no-ops for unit tests).
  * ----------------------------------------------------------------*/
 if ( ! function_exists( 'add_action' ) ) {
-    function add_action(): void {}
+    function add_action(): void { /* No-op stub */ } // NOSONAR
 }
 
 if ( ! function_exists( 'add_shortcode' ) ) {
-    function add_shortcode(): void {}
+    function add_shortcode(): void { /* No-op stub */ } // NOSONAR
 }
 
 if ( ! function_exists( 'wp_enqueue_style' ) ) {
-    function wp_enqueue_style(): void {}
+    function wp_enqueue_style(): void { /* No-op stub */ } // NOSONAR
 }
 
 if ( ! function_exists( 'wp_enqueue_script' ) ) {
-    function wp_enqueue_script(): void {}
+    function wp_enqueue_script(): void { /* No-op stub */ } // NOSONAR
 }
 
 if ( ! function_exists( 'shortcode_atts' ) ) {
-    function shortcode_atts( array $defaults, $atts, string $shortcode = '' ): array {
+    function shortcode_atts( array $defaults, $atts, string $shortcode = '' ): array { // NOSONAR - matches WP API signature
         $atts = (array) $atts;
         $result = $defaults;
         foreach ( $atts as $key => $value ) {

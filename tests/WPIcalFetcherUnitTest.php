@@ -186,7 +186,7 @@ class WPIcalFetcherUnitTest extends TestCase {
 
         $capturedArgs = null;
         global $wpical_test_http_response;
-        $wpical_test_http_response = function ( string $url, array $args ) use ( &$capturedArgs ) {
+        $wpical_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
             $capturedArgs = $args;
             return array( 'response' => array( 'code' => 200 ), 'body' => 'OK' );
         };
@@ -208,7 +208,7 @@ class WPIcalFetcherUnitTest extends TestCase {
 
         $capturedArgs = null;
         global $wpical_test_http_response;
-        $wpical_test_http_response = function ( string $url, array $args ) use ( &$capturedArgs ) {
+        $wpical_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
             $capturedArgs = $args;
             return array( 'response' => array( 'code' => 200 ), 'body' => 'OK' );
         };

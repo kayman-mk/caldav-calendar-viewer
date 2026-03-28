@@ -1,0 +1,33 @@
+name: Deploy to WordPress.org
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org SVN
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Stable tag in readme.txt
+        run: |
+          sed -i "s/^Stable tag:.*/Stable tag: ${{ steps.version.outputs.version }}/" readme.txt
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@v2
+        env:
+          SVN_USERNAME: ${{ secrets.WORDPRESS_ORG_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.WORDPRESS_ORG_PASSWORD }}
+          SLUG: wordpress-ical-calendar
+          VERSION: ${{ steps.version.outputs.version }}
+          ASSETS_DIR: .wordpress-org
+

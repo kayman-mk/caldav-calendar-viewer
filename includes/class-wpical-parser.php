@@ -33,8 +33,11 @@ class WPIcalParser {
         $events = array();
 
         // Unfold long lines per RFC 5545 §3.1.
-        $icalText = preg_replace( "/\r\n[ \t]/", '', $icalText );
-        $icalText = str_replace( "\r", "\n", $icalText );
+        $unfolded = preg_replace( "/\r\n[ \t]/", '', $icalText );
+        if ( null === $unfolded ) {
+            return $events;
+        }
+        $icalText = str_replace( "\r", "\n", $unfolded );
 
         // Extract VEVENT blocks.
         preg_match_all( '/BEGIN:VEVENT(.*?)END:VEVENT/s', $icalText, $matches );

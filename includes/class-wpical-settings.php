@@ -89,7 +89,7 @@ class WPIcalSettings {
             $existing = self::getFeed( $id );
 
             $clean[ $id ] = array(
-                'url'      => isset( $feed['url'] ) ? esc_url_raw( $feed['url'] ) : '',
+                'url'      => isset( $feed['url'] ) ? esc_url_raw( $feed['url'], array( 'http', 'https' ) ) : '',
                 'username' => isset( $feed['username'] ) ? sanitize_text_field( $feed['username'] ) : '',
                 'password' => isset( $feed['password'] ) && $feed['password'] !== ''
                     ? self::encrypt( $feed['password'] )
@@ -289,46 +289,109 @@ class WPIcalSettings {
      * ----------------------------------------------------------------*/
 
     /**
-     * Encrypt a value using OpenSSL (AES-256-CBC).
+     * Encrypt a value using OpenSSL (AES-256-CBC) with HMAC authentication.
+     *
+     * The output format is: base64( HMAC-SHA256(32 bytes) + IV(16 bytes) + ciphertext ).
+     * The HMAC prevents ciphertext tampering and padding oracle attacks.
      *
      * @param string $value Plain-text value.
-     * @return string Base64-encoded cipher text with IV prepended.
+     * @return string Base64-encoded authenticated cipher text, or empty string on failure.
      */
     public static function encrypt( string $value ): string {
-        if ( ! function_exists( 'openssl_encrypt' ) ) {
-            return base64_encode( $value );
+        $result = '';
+
+        if ( function_exists( 'openssl_encrypt' ) ) {
+            $key    = hash( 'sha256', AUTH_KEY, true );
+            $iv     = openssl_random_pseudo_bytes( 16 );
+            $cipher = openssl_encrypt( $value, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv );
+
+            if ( false !== $cipher ) {
+                $hmac   = hash_hmac( 'sha256', $iv . $cipher, $key, true );
+                $result = base64_encode( $hmac . $iv . $cipher );
+            }
         }
 
-        $key    = hash( 'sha256', AUTH_KEY, true );
-        $iv     = openssl_random_pseudo_bytes( 16 );
-        $cipher = openssl_encrypt( $value, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv );
-
-        return base64_encode( $iv . $cipher );
+        return $result;
     }
 
     /**
      * Decrypt a previously encrypted value.
      *
+     * Supports the current HMAC-authenticated format (HMAC + IV + ciphertext)
+     * and the legacy format (IV + ciphertext) for backwards compatibility.
+     *
      * @param string $encrypted Base64-encoded cipher text.
-     * @return string Decrypted plain-text value.
+     * @return string Decrypted plain-text value, or empty string on failure.
      */
     public static function decrypt( string $encrypted ): string {
-        if ( empty( $encrypted ) ) {
+        if ( empty( $encrypted ) || ! function_exists( 'openssl_decrypt' ) ) {
             return '';
         }
 
-        if ( ! function_exists( 'openssl_decrypt' ) ) {
-            return base64_decode( $encrypted );
+        $data = base64_decode( $encrypted, true );
+        if ( false === $data ) {
+            return '';
         }
 
-        $data = base64_decode( $encrypted );
-        $key  = hash( 'sha256', AUTH_KEY, true );
-        $iv   = substr( $data, 0, 16 );
-        $raw  = substr( $data, 16 );
+        $key = hash( 'sha256', AUTH_KEY, true );
+
+        // Data long enough for the authenticated format must pass HMAC verification.
+        // Falling back to legacy on HMAC failure would defeat tamper detection.
+        $result = ( strlen( $data ) >= 49 )
+            ? self::decryptAuthenticated( $data, $key )
+            : self::decryptLegacy( $data, $key );
+
+        return $result ?? '';
+    }
+
+    /**
+     * Attempt decryption using the HMAC-authenticated format.
+     *
+     * Expected layout: HMAC(32 bytes) + IV(16 bytes) + ciphertext(>=1 byte).
+     *
+     * @param string $data Raw decoded bytes.
+     * @param string $key  Derived encryption key.
+     * @return string|null Decrypted value, or null if format does not match.
+     */
+    private static function decryptAuthenticated( string $data, string $key ): ?string {
+        if ( strlen( $data ) < 49 ) {
+            return null;
+        }
+
+        $hmac = substr( $data, 0, 32 );
+        $iv   = substr( $data, 32, 16 );
+        $raw  = substr( $data, 48 );
+
+        $expectedHmac = hash_hmac( 'sha256', $iv . $raw, $key, true );
+        if ( ! hash_equals( $expectedHmac, $hmac ) ) {
+            return null;
+        }
 
         $decrypted = openssl_decrypt( $raw, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv );
 
-        return $decrypted !== false ? $decrypted : '';
+        return $decrypted !== false ? $decrypted : null;
+    }
+
+    /**
+     * Attempt decryption using the legacy format (IV + ciphertext, no HMAC).
+     *
+     * Expected layout: IV(16 bytes) + ciphertext(>=1 byte).
+     *
+     * @param string $data Raw decoded bytes.
+     * @param string $key  Derived encryption key.
+     * @return string|null Decrypted value, or null if format does not match.
+     */
+    private static function decryptLegacy( string $data, string $key ): ?string {
+        if ( strlen( $data ) < 17 ) {
+            return null;
+        }
+
+        $iv  = substr( $data, 0, 16 );
+        $raw = substr( $data, 16 );
+
+        $decrypted = openssl_decrypt( $raw, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv );
+
+        return $decrypted !== false ? $decrypted : null;
     }
 
     /* ------------------------------------------------------------------

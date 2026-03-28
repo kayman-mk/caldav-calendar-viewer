@@ -12,6 +12,9 @@ class WPIcalFetcher {
     /** Transient key prefix used for caching. */
     private const CACHE_KEY = 'wpical_feed_cache';
 
+    /** Maximum allowed response body size in bytes (2 MB). */
+    private const MAX_RESPONSE_SIZE = 2 * 1024 * 1024;
+
     /**
      * Fetch the iCal feed contents for a given feed ID.
      *
@@ -118,8 +121,9 @@ class WPIcalFetcher {
      */
     private static function executeRequest( string $url, string $username, string $password ) {
         $args = array(
-            'timeout'   => 30,
-            'sslverify' => true,
+            'timeout'             => 30,
+            'sslverify'           => true,
+            'limit_response_size' => self::MAX_RESPONSE_SIZE,
         );
 
         if ( ! empty( $username ) && ! empty( $password ) ) {

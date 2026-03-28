@@ -1,5 +1,5 @@
 /**
- * WordPress iCal Calendar – Front-end JavaScript.
+ * ICal Calendar View – Front-end JavaScript.
  *
  * Adds interactive tooltips for calendar events on hover.
  */
@@ -14,11 +14,11 @@
         }
 
         // Prevent default browser tooltip.
-        event.currentTarget.dataset.wpicalTitle = title;
+        event.currentTarget.dataset.icalcvTitle = title;
         event.currentTarget.removeAttribute('title');
 
         var tooltip = document.createElement('div');
-        tooltip.className = 'wpical-tooltip';
+        tooltip.className = 'icalcv-tooltip';
         tooltip.textContent = title;
         document.body.appendChild(tooltip);
 
@@ -26,37 +26,37 @@
         tooltip.style.top = (window.scrollY + rect.bottom + 6) + 'px';
         tooltip.style.left = (window.scrollX + rect.left) + 'px';
 
-        event.currentTarget._wpicalTooltip = tooltip;
+        event.currentTarget._icalcvTooltip = tooltip;
     }
 
     /** Remove the tooltip element. */
     function hideTooltip(event) {
         var el = event.currentTarget;
-        if (el._wpicalTooltip) {
-            el._wpicalTooltip.remove();
-            delete el._wpicalTooltip;
+        if (el._icalcvTooltip) {
+            el._icalcvTooltip.remove();
+            delete el._icalcvTooltip;
         }
         // Restore title attribute.
-        if (el.dataset.wpicalTitle) {
-            el.setAttribute('title', el.dataset.wpicalTitle);
-            delete el.dataset.wpicalTitle;
+        if (el.dataset.icalcvTitle) {
+            el.setAttribute('title', el.dataset.icalcvTitle);
+            delete el.dataset.icalcvTitle;
         }
     }
 
     /** Bind listeners once the DOM is ready. */
     function init() {
-        var events = document.querySelectorAll('.wpical-event[title]');
+        var events = document.querySelectorAll('.icalcv-event[title]');
         for (var i = 0; i < events.length; i++) {
             events[i].addEventListener('mouseenter', showTooltip);
             events[i].addEventListener('mouseleave', hideTooltip);
         }
 
         // Inject tooltip styles once.
-        if (!document.getElementById('wpical-tooltip-style')) {
+        if (!document.getElementById('icalcv-tooltip-style')) {
             var style = document.createElement('style');
-            style.id = 'wpical-tooltip-style';
+            style.id = 'icalcv-tooltip-style';
             style.textContent =
-                '.wpical-tooltip {' +
+                '.icalcv-tooltip {' +
                 '  position: absolute;' +
                 '  z-index: 100000;' +
                 '  max-width: 280px;' +

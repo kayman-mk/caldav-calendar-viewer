@@ -7,10 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WPIcalFetcher {
+class ICalCVFetcher {
 
     /** Transient key prefix used for caching. */
-    private const CACHE_KEY = 'wpical_feed_cache';
+    private const CACHE_KEY = 'icalcv_feed_cache';
 
     /** Maximum allowed response body size in bytes (2 MB). */
     private const MAX_RESPONSE_SIZE = 2 * 1024 * 1024;
@@ -22,7 +22,7 @@ class WPIcalFetcher {
      * using the provided $feedId. Results are cached using WordPress transients
      * according to the configured TTL.
      *
-     * @param string $feedId The feed identifier configured in Settings → iCal Calendar.
+     * @param string $feedId The feed identifier configured in Settings → ICal Calendar View.
      * @return string|WP_Error The raw iCal string on success, WP_Error on failure.
      */
     public static function fetch( string $feedId ) {
@@ -31,10 +31,10 @@ class WPIcalFetcher {
             return $validationError;
         }
 
-        $feed     = WPIcalSettings::getFeed( $feedId );
+        $feed     = ICalCVSettings::getFeed( $feedId );
         $url      = $feed['url'];
         $username = $feed['username'];
-        $password = WPIcalSettings::getFeedPassword( $feedId );
+        $password = ICalCVSettings::getFeedPassword( $feedId );
 
         $cached = self::getCachedResponse( $feedId, $url );
         if ( null !== $cached ) {
@@ -58,18 +58,18 @@ class WPIcalFetcher {
      */
     private static function validateFeed( string $feedId ): ?WP_Error {
         if ( empty( $feedId ) ) {
-            return new WP_Error( 'wpical_no_id', __( 'No feed ID provided. Use [wpical_calendar id="your-feed-id"].', 'wp-ical-calendar' ) );
+            return new WP_Error( 'icalcv_no_id', __( 'No feed ID provided. Use [icalcv_calendar id="your-feed-id"].', 'ical-calendar-view' ) );
         }
 
-        $feed = WPIcalSettings::getFeed( $feedId );
+        $feed = ICalCVSettings::getFeed( $feedId );
 
         if ( null === $feed || empty( $feed['url'] ) ) {
-            $errorCode = ( null === $feed ) ? 'wpical_unknown_feed' : 'wpical_no_url';
+            $errorCode = ( null === $feed ) ? 'icalcv_unknown_feed' : 'icalcv_no_url';
             $errorMsg  = ( null === $feed )
                 ? /* translators: %s: feed ID */
-                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → iCal Calendar.', 'wp-ical-calendar' )
+                  __( 'Unknown calendar feed ID: "%s". Please configure it under Settings → ICal Calendar View.', 'ical-calendar-view' )
                 : /* translators: %s: feed ID */
-                  __( 'No URL configured for feed "%s".', 'wp-ical-calendar' );
+                  __( 'No URL configured for feed "%s".', 'ical-calendar-view' );
 
             return new WP_Error( $errorCode, sprintf( $errorMsg, $feedId ) );
         }
@@ -85,7 +85,7 @@ class WPIcalFetcher {
      * @return string|null Cached body or null if not cached.
      */
     private static function getCachedResponse( string $feedId, string $url ): ?string {
-        $cacheTtl = WPIcalSettings::getCacheTtl();
+        $cacheTtl = ICalCVSettings::getCacheTtl();
         if ( $cacheTtl <= 0 ) {
             return null;
         }
@@ -104,7 +104,7 @@ class WPIcalFetcher {
      * @param string $body   Response body.
      */
     private static function cacheResponse( string $feedId, string $url, string $body ): void {
-        $cacheTtl = WPIcalSettings::getCacheTtl();
+        $cacheTtl = ICalCVSettings::getCacheTtl();
         if ( $cacheTtl > 0 ) {
             $cacheKey = self::CACHE_KEY . '_' . md5( $feedId . '|' . $url );
             set_transient( $cacheKey, $body, $cacheTtl );
@@ -141,10 +141,10 @@ class WPIcalFetcher {
         $code = wp_remote_retrieve_response_code( $response );
         if ( $code < 200 || $code >= 300 ) {
             return new WP_Error(
-                'wpical_http_error',
+                'icalcv_http_error',
                 sprintf(
                     /* translators: %d: HTTP status code */
-                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'wp-ical-calendar' ),
+                    __( 'Failed to fetch iCal feed. HTTP status: %d', 'ical-calendar-view' ),
                     $code
                 )
             );

@@ -3,14 +3,14 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for the WPIcalSettings class.
+ * Unit tests for the ICalCVSettings class.
  */
-class WPIcalSettingsUnitTest extends TestCase {
+class ICalCVSettingsUnitTest extends TestCase {
 
     protected function setUp(): void {
         // Reset the in-memory option store before each test.
-        global $wpical_test_options;
-        $wpical_test_options = array();
+        global $icalcv_test_options;
+        $icalcv_test_options = array();
     }
 
     /* ------------------------------------------------------------------
@@ -20,8 +20,8 @@ class WPIcalSettingsUnitTest extends TestCase {
     public function test_should_returnOriginalValue_when_encryptedThenDecrypted(): void {
         $plain = 'my-secret-password';
 
-        $encrypted = WPIcalSettings::encrypt( $plain );
-        $decrypted = WPIcalSettings::decrypt( $encrypted );
+        $encrypted = ICalCVSettings::encrypt( $plain );
+        $decrypted = ICalCVSettings::decrypt( $encrypted );
 
         $this->assertSame( $plain, $decrypted );
     }
@@ -29,21 +29,21 @@ class WPIcalSettingsUnitTest extends TestCase {
     public function test_should_produceDifferentCiphertext_when_encryptingSameValueTwice(): void {
         $plain = 'same-password';
 
-        $first  = WPIcalSettings::encrypt( $plain );
-        $second = WPIcalSettings::encrypt( $plain );
+        $first  = ICalCVSettings::encrypt( $plain );
+        $second = ICalCVSettings::encrypt( $plain );
 
         // Different IV each time → different ciphertext.
         $this->assertNotSame( $first, $second );
     }
 
     public function test_should_returnEmptyString_when_decryptingEmptyString(): void {
-        $result = WPIcalSettings::decrypt( '' );
+        $result = ICalCVSettings::decrypt( '' );
 
         $this->assertSame( '', $result );
     }
 
     public function test_should_returnEmptyString_when_decryptingTamperedCiphertext(): void {
-        $encrypted = WPIcalSettings::encrypt( 'sensitive-data' );
+        $encrypted = ICalCVSettings::encrypt( 'sensitive-data' );
         $this->assertNotEmpty( $encrypted );
 
         // Tamper with a byte in the middle of the base64-encoded ciphertext.
@@ -51,14 +51,14 @@ class WPIcalSettingsUnitTest extends TestCase {
         $bytes[0] = $bytes[0] === "\x00" ? "\x01" : "\x00";
         $tampered = base64_encode( $bytes );
 
-        $result = WPIcalSettings::decrypt( $tampered );
+        $result = ICalCVSettings::decrypt( $tampered );
 
         $this->assertSame( '', $result );
     }
 
     public function test_should_returnEmptyString_when_decryptingGarbageInput(): void {
-        $this->assertSame( '', WPIcalSettings::decrypt( 'not-valid-encrypted-data' ) );
-        $this->assertSame( '', WPIcalSettings::decrypt( '!!!' ) );
+        $this->assertSame( '', ICalCVSettings::decrypt( 'not-valid-encrypted-data' ) );
+        $this->assertSame( '', ICalCVSettings::decrypt( '!!!' ) );
     }
 
     /* ------------------------------------------------------------------
@@ -66,18 +66,18 @@ class WPIcalSettingsUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnEmptyArray_when_noFeedsConfigured(): void {
-        $feeds = WPIcalSettings::getAllFeeds();
+        $feeds = ICalCVSettings::getAllFeeds();
 
         $this->assertSame( array(), $feeds );
     }
 
     public function test_should_returnAllFeeds_when_feedsExistInOptions(): void {
-        update_option( 'wpical_feeds', array(
+        update_option( 'icalcv_feeds', array(
             'team' => array( 'url' => 'https://example.com/team.ics', 'username' => 'user', 'password' => 'enc' ),
             'hr'   => array( 'url' => 'https://example.com/hr.ics', 'username' => '', 'password' => '' ),
         ) );
 
-        $feeds = WPIcalSettings::getAllFeeds();
+        $feeds = ICalCVSettings::getAllFeeds();
 
         $this->assertCount( 2, $feeds );
         $this->assertArrayHasKey( 'team', $feeds );
@@ -85,9 +85,9 @@ class WPIcalSettingsUnitTest extends TestCase {
     }
 
     public function test_should_returnEmptyArray_when_optionIsNotArray(): void {
-        update_option( 'wpical_feeds', 'invalid-string' );
+        update_option( 'icalcv_feeds', 'invalid-string' );
 
-        $feeds = WPIcalSettings::getAllFeeds();
+        $feeds = ICalCVSettings::getAllFeeds();
 
         $this->assertSame( array(), $feeds );
     }
@@ -97,17 +97,17 @@ class WPIcalSettingsUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnNull_when_feedIdDoesNotExist(): void {
-        $feed = WPIcalSettings::getFeed( 'nonexistent' );
+        $feed = ICalCVSettings::getFeed( 'nonexistent' );
 
         $this->assertNull( $feed );
     }
 
     public function test_should_returnFeedData_when_feedIdExists(): void {
-        update_option( 'wpical_feeds', array(
+        update_option( 'icalcv_feeds', array(
             'team' => array( 'url' => 'https://example.com/team.ics', 'username' => 'admin', 'password' => 'secret_enc' ),
         ) );
 
-        $feed = WPIcalSettings::getFeed( 'team' );
+        $feed = ICalCVSettings::getFeed( 'team' );
 
         $this->assertNotNull( $feed );
         $this->assertSame( 'https://example.com/team.ics', $feed['url'] );
@@ -116,11 +116,11 @@ class WPIcalSettingsUnitTest extends TestCase {
     }
 
     public function test_should_returnEmptyDefaults_when_feedHasMissingKeys(): void {
-        update_option( 'wpical_feeds', array(
+        update_option( 'icalcv_feeds', array(
             'minimal' => array(),
         ) );
 
-        $feed = WPIcalSettings::getFeed( 'minimal' );
+        $feed = ICalCVSettings::getFeed( 'minimal' );
 
         $this->assertNotNull( $feed );
         $this->assertSame( '', $feed['url'] );
@@ -133,20 +133,20 @@ class WPIcalSettingsUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnEmptyString_when_feedDoesNotExist(): void {
-        $password = WPIcalSettings::getFeedPassword( 'nonexistent' );
+        $password = ICalCVSettings::getFeedPassword( 'nonexistent' );
 
         $this->assertSame( '', $password );
     }
 
     public function test_should_returnDecryptedPassword_when_feedHasEncryptedPassword(): void {
         $plain     = 'super-secret';
-        $encrypted = WPIcalSettings::encrypt( $plain );
+        $encrypted = ICalCVSettings::encrypt( $plain );
 
-        update_option( 'wpical_feeds', array(
+        update_option( 'icalcv_feeds', array(
             'team' => array( 'url' => 'https://example.com', 'username' => 'u', 'password' => $encrypted ),
         ) );
 
-        $password = WPIcalSettings::getFeedPassword( 'team' );
+        $password = ICalCVSettings::getFeedPassword( 'team' );
 
         $this->assertSame( $plain, $password );
     }
@@ -156,15 +156,15 @@ class WPIcalSettingsUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnDefaultTtl_when_optionNotSet(): void {
-        $ttl = WPIcalSettings::getCacheTtl();
+        $ttl = ICalCVSettings::getCacheTtl();
 
         $this->assertSame( 3600, $ttl );
     }
 
     public function test_should_returnConfiguredTtl_when_optionIsSet(): void {
-        update_option( 'wpical_cache_ttl', 7200 );
+        update_option( 'icalcv_cache_ttl', 7200 );
 
-        $ttl = WPIcalSettings::getCacheTtl();
+        $ttl = ICalCVSettings::getCacheTtl();
 
         $this->assertSame( 7200, $ttl );
     }
@@ -174,14 +174,14 @@ class WPIcalSettingsUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnEmptyArray_when_inputIsNotArray(): void {
-        $settings = new WPIcalSettings();
+        $settings = new ICalCVSettings();
         $result   = $settings->sanitizeFeeds( 'not-an-array' );
 
         $this->assertSame( array(), $result );
     }
 
     public function test_should_skipEntry_when_feedIdIsEmpty(): void {
-        $settings = new WPIcalSettings();
+        $settings = new ICalCVSettings();
         $result   = $settings->sanitizeFeeds( array(
             array( 'id' => '', 'url' => 'https://example.com' ),
         ) );
@@ -190,7 +190,7 @@ class WPIcalSettingsUnitTest extends TestCase {
     }
 
     public function test_should_sanitizeFeedCorrectly_when_validInputProvided(): void {
-        $settings = new WPIcalSettings();
+        $settings = new ICalCVSettings();
         $result   = $settings->sanitizeFeeds( array(
             array(
                 'id'       => 'My-Feed',
@@ -210,7 +210,7 @@ class WPIcalSettingsUnitTest extends TestCase {
     }
 
     public function test_should_rejectNonHttpSchemes_when_feedUrlUsesFtp(): void {
-        $settings = new WPIcalSettings();
+        $settings = new ICalCVSettings();
         $result   = $settings->sanitizeFeeds( array(
             array(
                 'id'       => 'evil',
@@ -226,12 +226,12 @@ class WPIcalSettingsUnitTest extends TestCase {
 
     public function test_should_keepExistingPassword_when_passwordFieldIsEmpty(): void {
         // Pre-populate a feed with an encrypted password.
-        $existingEnc = WPIcalSettings::encrypt( 'old-password' );
-        update_option( 'wpical_feeds', array(
+        $existingEnc = ICalCVSettings::encrypt( 'old-password' );
+        update_option( 'icalcv_feeds', array(
             'team' => array( 'url' => 'https://example.com', 'username' => 'u', 'password' => $existingEnc ),
         ) );
 
-        $settings = new WPIcalSettings();
+        $settings = new ICalCVSettings();
         $result   = $settings->sanitizeFeeds( array(
             array( 'id' => 'team', 'url' => 'https://example.com/new.ics', 'username' => 'u', 'password' => '' ),
         ) );

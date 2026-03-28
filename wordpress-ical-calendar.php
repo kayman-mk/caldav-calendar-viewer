@@ -1,53 +1,80 @@
 <?php
 /**
- * Plugin Name: WordPress iCal Calendar
+ * Plugin Name: ICal Calendar View
  * Plugin URI:  https://github.com/kayman-mk/wordpress-ical-calendar
  * Description: Displays events from an iCal (.ics) feed in a calendar view. Supports authenticated (username/password) iCal endpoints.
  * Version:     1.0.0
  * Author:      kayman-mk
  * License:     GPL-2.0-or-later
- * Text Domain: wp-ical-calendar
+ * Text Domain: ical-calendar-view
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'WPICAL_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'WPICAL_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'WPICAL_VERSION', '1.0.0' );
+define( 'ICALCV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'ICALCV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'ICALCV_VERSION', '1.0.0' );
 
-require_once WPICAL_PLUGIN_DIR . 'includes/class-wpical-settings.php';
-require_once WPICAL_PLUGIN_DIR . 'includes/class-wpical-fetcher.php';
-require_once WPICAL_PLUGIN_DIR . 'includes/class-wpical-parser.php';
-require_once WPICAL_PLUGIN_DIR . 'includes/class-wpical-shortcode.php';
+require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-settings.php';
+require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-fetcher.php';
+require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-parser.php';
+require_once ICALCV_PLUGIN_DIR . 'includes/class-icalcv-shortcode.php';
+
+/**
+ * Holds references to the plugin component instances to prevent garbage collection.
+ *
+ * @var array<string, object>
+ */
+global $icalcv_instances;
+$icalcv_instances = array();
 
 /**
  * Initialize the plugin components.
  */
-function wpical_init() {
-    new WPIcalSettings();
-    new WPIcalShortcode();
+function icalcv_init() {
+    global $icalcv_instances;
+
+    $icalcv_instances['settings']  = new ICalCVSettings();
+    $icalcv_instances['shortcode'] = new ICalCVShortcode();
 }
-add_action( 'plugins_loaded', 'wpical_init' );
+add_action( 'plugins_loaded', 'icalcv_init' );
+
+/**
+ * Add a "Settings" link on the Plugins list page.
+ *
+ * @param array $links Existing action links.
+ * @return array Modified action links.
+ */
+function icalcv_plugin_action_links( array $links ): array {
+    $settings_link = '<a href="' . esc_url( admin_url( 'options-general.php?page=icalcv-settings' ) ) . '">'
+        . esc_html__( 'Settings', 'ical-calendar-view' )
+        . '</a>';
+
+    array_unshift( $links, $settings_link );
+
+    return $links;
+}
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'icalcv_plugin_action_links' );
 
 /**
  * Enqueue front-end assets when the shortcode is used.
  */
-function wpical_enqueue_assets() {
+function icalcv_enqueue_assets() {
     wp_register_style(
-        'wpical-calendar-style',
-        WPICAL_PLUGIN_URL . 'assets/css/calendar.css',
+        'icalcv-calendar-style',
+        ICALCV_PLUGIN_URL . 'assets/css/calendar.css',
         array(),
-        WPICAL_VERSION
+        ICALCV_VERSION
     );
     wp_register_script(
-        'wpical-calendar-script',
-        WPICAL_PLUGIN_URL . 'assets/js/calendar.js',
+        'icalcv-calendar-script',
+        ICALCV_PLUGIN_URL . 'assets/js/calendar.js',
         array(),
-        WPICAL_VERSION,
+        ICALCV_VERSION,
         true
     );
 }
-add_action( 'wp_enqueue_scripts', 'wpical_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'icalcv_enqueue_assets' );
 

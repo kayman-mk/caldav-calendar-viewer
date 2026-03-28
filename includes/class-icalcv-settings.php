@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin settings page for WordPress iCal Calendar.
+ * Admin settings page for ICal Calendar View.
  *
  * Manages multiple iCal calendar feeds (each with URL, username, password)
  * and a global cache TTL via the WordPress Settings API.
@@ -8,7 +8,7 @@
  * Feeds are stored as a single option containing an associative array keyed
  * by a user-chosen ID:
  *
- *   wpical_feeds = [
+ *   icalcv_feeds = [
  *       'team' => [ 'url' => '…', 'username' => '…', 'password' => '…' ],
  *       'hr'   => [ 'url' => '…', 'username' => '',  'password' => ''  ],
  *   ]
@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WPIcalSettings {
+class ICalCVSettings {
 
     /** Settings page slug. */
-    private const PAGE_SLUG = 'wpical-settings';
+    private const PAGE_SLUG = 'icalcv-settings';
 
     /** Option keys stored in the database. */
-    private const OPT_FEEDS     = 'wpical_feeds';
-    private const OPT_CACHE_TTL = 'wpical_cache_ttl';
+    private const OPT_FEEDS     = 'icalcv_feeds';
+    private const OPT_CACHE_TTL = 'icalcv_cache_ttl';
 
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'addSettingsPage' ) );
@@ -37,8 +37,8 @@ class WPIcalSettings {
      */
     public function addSettingsPage(): void {
         add_options_page(
-            __( 'iCal Calendar Settings', 'wp-ical-calendar' ),
-            __( 'iCal Calendar', 'wp-ical-calendar' ),
+            __( 'ICal Calendar View Settings', 'ical-calendar-view' ),
+            __( 'ICal Calendar View', 'ical-calendar-view' ),
             'manage_options',
             self::PAGE_SLUG,
             array( $this, 'renderSettingsPage' )
@@ -121,12 +121,12 @@ class WPIcalSettings {
             <form action="options.php" method="post">
                 <?php settings_fields( self::PAGE_SLUG ); ?>
 
-                <h2><?php esc_html_e( 'Calendar Feeds', 'wp-ical-calendar' ); ?></h2>
+                <h2><?php esc_html_e( 'Calendar Feeds', 'ical-calendar-view' ); ?></h2>
                 <p class="description">
-                    <?php esc_html_e( 'Define one or more iCal feeds. Each feed needs a unique ID that you reference in the shortcode.', 'wp-ical-calendar' ); ?>
+                    <?php esc_html_e( 'Define one or more iCal feeds. Each feed needs a unique ID that you reference in the shortcode.', 'ical-calendar-view' ); ?>
                 </p>
 
-                <div id="wpical-feeds-container">
+                <div id="icalcv-feeds-container">
                     <?php
                     if ( empty( $feeds ) ) {
                         $this->renderFeedRow( '', array(), 0 );
@@ -141,24 +141,24 @@ class WPIcalSettings {
                 </div>
 
                 <p>
-                    <button type="button" class="button" id="wpical-add-feed">
-                        <?php esc_html_e( '+ Add Feed', 'wp-ical-calendar' ); ?>
+                    <button type="button" class="button" id="icalcv-add-feed">
+                        <?php esc_html_e( '+ Add Feed', 'ical-calendar-view' ); ?>
                     </button>
                 </p>
 
                 <hr />
 
-                <h2><?php esc_html_e( 'General Settings', 'wp-ical-calendar' ); ?></h2>
-                <div class="wpical-field-row">
+                <h2><?php esc_html_e( 'General Settings', 'ical-calendar-view' ); ?></h2>
+                <div class="icalcv-field-row">
                     <label for="<?php echo esc_attr( self::OPT_CACHE_TTL ); ?>">
-                        <?php esc_html_e( 'Cache Lifetime (seconds)', 'wp-ical-calendar' ); ?>
+                        <?php esc_html_e( 'Cache Lifetime (seconds)', 'ical-calendar-view' ); ?>
                     </label>
                     <input type="number" id="<?php echo esc_attr( self::OPT_CACHE_TTL ); ?>"
                            name="<?php echo esc_attr( self::OPT_CACHE_TTL ); ?>"
                            value="<?php echo esc_attr( $cacheTtl ); ?>"
                            class="small-text" min="0" step="1" />
                     <p class="description">
-                        <?php esc_html_e( 'How long (in seconds) fetched calendar data should be cached. Set to 0 to disable caching.', 'wp-ical-calendar' ); ?>
+                        <?php esc_html_e( 'How long (in seconds) fetched calendar data should be cached. Set to 0 to disable caching.', 'ical-calendar-view' ); ?>
                     </p>
                 </div>
 
@@ -166,14 +166,14 @@ class WPIcalSettings {
             </form>
 
             <hr />
-            <h2><?php esc_html_e( 'Usage', 'wp-ical-calendar' ); ?></h2>
-            <p><?php esc_html_e( 'Add the following shortcode to any page or post, referencing a feed by its ID:', 'wp-ical-calendar' ); ?></p>
-            <code>[wpical_calendar id="my-feed"]</code>
-            <p><?php esc_html_e( 'Optional: set how many months to display:', 'wp-ical-calendar' ); ?></p>
-            <code>[wpical_calendar id="my-feed" months="3"]</code>
+            <h2><?php esc_html_e( 'Usage', 'ical-calendar-view' ); ?></h2>
+            <p><?php esc_html_e( 'Add the following shortcode to any page or post, referencing a feed by its ID:', 'ical-calendar-view' ); ?></p>
+            <code>[icalcv_calendar id="my-feed"]</code>
+            <p><?php esc_html_e( 'Optional: set how many months to display:', 'ical-calendar-view' ); ?></p>
+            <code>[icalcv_calendar id="my-feed" months="3"]</code>
 
             <?php if ( ! empty( $feeds ) ) : ?>
-                <h3><?php esc_html_e( 'Configured Feed IDs', 'wp-ical-calendar' ); ?></h3>
+                <h3><?php esc_html_e( 'Configured Feed IDs', 'ical-calendar-view' ); ?></h3>
                 <ul>
                     <?php foreach ( array_keys( $feeds ) as $fid ) : ?>
                         <li><code><?php echo esc_html( $fid ); ?></code></li>
@@ -183,22 +183,22 @@ class WPIcalSettings {
         </div>
 
         <style>
-            .wpical-field-row { margin-bottom: 16px; }
-            .wpical-field-row label { display: block; font-weight: 600; margin-bottom: 4px; }
-            .wpical-field-row .description { margin-top: 4px; }
-            .wpical-feed-fields { display: grid; grid-template-columns: 1fr; gap: 12px; }
-            .wpical-feed-field label { display: block; font-weight: 600; margin-bottom: 4px; }
-            .wpical-feed-field .description { margin-top: 4px; }
+            .icalcv-field-row { margin-bottom: 16px; }
+            .icalcv-field-row label { display: block; font-weight: 600; margin-bottom: 4px; }
+            .icalcv-field-row .description { margin-top: 4px; }
+            .icalcv-feed-fields { display: grid; grid-template-columns: 1fr; gap: 12px; }
+            .icalcv-feed-field label { display: block; font-weight: 600; margin-bottom: 4px; }
+            .icalcv-feed-field .description { margin-top: 4px; }
         </style>
 
         <script>
         (function () {
-            var container = document.getElementById('wpical-feeds-container');
-            var addBtn    = document.getElementById('wpical-add-feed');
-            var index     = container.querySelectorAll('.wpical-feed-row').length;
+            var container = document.getElementById('icalcv-feeds-container');
+            var addBtn    = document.getElementById('icalcv-add-feed');
+            var index     = container.querySelectorAll('.icalcv-feed-row').length;
 
             addBtn.addEventListener('click', function () {
-                var tpl = document.querySelector('.wpical-feed-row');
+                var tpl = document.querySelector('.icalcv-feed-row');
                 var clone = tpl.cloneNode(true);
                 clone.querySelectorAll('input').forEach(function (input) {
                     input.name  = input.name.replace(/\[\d+\]/, '[' + index + ']');
@@ -219,10 +219,10 @@ class WPIcalSettings {
             });
 
             container.addEventListener('click', function (e) {
-                if (e.target.classList.contains('wpical-remove-feed')) {
-                    var rows = container.querySelectorAll('.wpical-feed-row');
+                if (e.target.classList.contains('icalcv-remove-feed')) {
+                    var rows = container.querySelectorAll('.icalcv-feed-row');
                     if (rows.length > 1) {
-                        e.target.closest('.wpical-feed-row').remove();
+                        e.target.closest('.icalcv-feed-row').remove();
                     }
                 }
             });
@@ -240,45 +240,45 @@ class WPIcalSettings {
      */
     private function renderFeedRow( string $feedId, array $feed, int $index ): void {
         $namePrefix = self::OPT_FEEDS . '[' . $index . ']';
-        $idPrefix   = 'wpical_feed_' . $index . '_';
+        $idPrefix   = 'icalcv_feed_' . $index . '_';
         ?>
-        <div class="wpical-feed-row" style="border:1px solid #ccd0d4; padding:12px; margin-bottom:10px; background:#f6f7f7; border-radius:4px;">
-            <div class="wpical-feed-fields">
-                <div class="wpical-feed-field">
-                    <label for="<?php echo esc_attr( $idPrefix . 'id' ); ?>"><?php esc_html_e( 'Feed ID', 'wp-ical-calendar' ); ?></label>
+        <div class="icalcv-feed-row" style="border:1px solid #ccd0d4; padding:12px; margin-bottom:10px; background:#f6f7f7; border-radius:4px;">
+            <div class="icalcv-feed-fields">
+                <div class="icalcv-feed-field">
+                    <label for="<?php echo esc_attr( $idPrefix . 'id' ); ?>"><?php esc_html_e( 'Feed ID', 'ical-calendar-view' ); ?></label>
                     <input type="text" id="<?php echo esc_attr( $idPrefix . 'id' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[id]' ); ?>"
                            value="<?php echo esc_attr( $feedId ); ?>"
                            class="regular-text" placeholder="my-team-calendar"
-                           pattern="[a-z0-9\-_]+" title="<?php esc_attr_e( 'Lowercase letters, numbers, hyphens and underscores only', 'wp-ical-calendar' ); ?>" required />
-                    <p class="description"><?php esc_html_e( 'Unique identifier used in the shortcode (lowercase, no spaces).', 'wp-ical-calendar' ); ?></p>
+                           pattern="[a-z0-9\-_]+" title="<?php esc_attr_e( 'Lowercase letters, numbers, hyphens and underscores only', 'ical-calendar-view' ); ?>" required />
+                    <p class="description"><?php esc_html_e( 'Unique identifier used in the shortcode (lowercase, no spaces).', 'ical-calendar-view' ); ?></p>
                 </div>
-                <div class="wpical-feed-field">
-                    <label for="<?php echo esc_attr( $idPrefix . 'url' ); ?>"><?php esc_html_e( 'iCal Feed URL', 'wp-ical-calendar' ); ?></label>
+                <div class="icalcv-feed-field">
+                    <label for="<?php echo esc_attr( $idPrefix . 'url' ); ?>"><?php esc_html_e( 'iCal Feed URL', 'ical-calendar-view' ); ?></label>
                     <input type="url" id="<?php echo esc_attr( $idPrefix . 'url' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[url]' ); ?>"
                            value="<?php echo esc_attr( $feed['url'] ?? '' ); ?>"
                            class="regular-text" placeholder="https://example.com/calendar.ics" />
                 </div>
-                <div class="wpical-feed-field">
-                    <label for="<?php echo esc_attr( $idPrefix . 'username' ); ?>"><?php esc_html_e( 'Username', 'wp-ical-calendar' ); ?></label>
+                <div class="icalcv-feed-field">
+                    <label for="<?php echo esc_attr( $idPrefix . 'username' ); ?>"><?php esc_html_e( 'Username', 'ical-calendar-view' ); ?></label>
                     <input type="text" id="<?php echo esc_attr( $idPrefix . 'username' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[username]' ); ?>"
                            value="<?php echo esc_attr( $feed['username'] ?? '' ); ?>"
                            class="regular-text" autocomplete="off" />
-                    <p class="description"><?php esc_html_e( 'Leave blank if the feed does not require authentication.', 'wp-ical-calendar' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Leave blank if the feed does not require authentication.', 'ical-calendar-view' ); ?></p>
                 </div>
-                <div class="wpical-feed-field">
-                    <label for="<?php echo esc_attr( $idPrefix . 'password' ); ?>"><?php esc_html_e( 'Password', 'wp-ical-calendar' ); ?></label>
+                <div class="icalcv-feed-field">
+                    <label for="<?php echo esc_attr( $idPrefix . 'password' ); ?>"><?php esc_html_e( 'Password', 'ical-calendar-view' ); ?></label>
                     <input type="password" id="<?php echo esc_attr( $idPrefix . 'password' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[password]' ); ?>"
                            value="" class="regular-text" autocomplete="new-password"
                            placeholder="<?php echo ! empty( $feed['password'] ) ? '••••••••' : ''; ?>" />
-                    <p class="description"><?php esc_html_e( 'Leave blank to keep the current password. The password is stored encrypted.', 'wp-ical-calendar' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Leave blank to keep the current password. The password is stored encrypted.', 'ical-calendar-view' ); ?></p>
                 </div>
             </div>
             <p style="text-align:right; margin:0;">
-                <button type="button" class="button wpical-remove-feed"><?php esc_html_e( 'Remove', 'wp-ical-calendar' ); ?></button>
+                <button type="button" class="button icalcv-remove-feed"><?php esc_html_e( 'Remove', 'ical-calendar-view' ); ?></button>
             </p>
         </div>
         <?php

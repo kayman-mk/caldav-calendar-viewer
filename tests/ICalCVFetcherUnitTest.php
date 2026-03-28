@@ -3,15 +3,15 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for the WPIcalFetcher class.
+ * Unit tests for the ICalCVFetcher class.
  */
-class WPIcalFetcherUnitTest extends TestCase {
+class ICalCVFetcherUnitTest extends TestCase {
 
     protected function setUp(): void {
-        global $wpical_test_options, $wpical_test_transients, $wpical_test_http_response;
-        $wpical_test_options       = array();
-        $wpical_test_transients    = array();
-        $wpical_test_http_response = null;
+        global $icalcv_test_options, $icalcv_test_transients, $icalcv_test_http_response;
+        $icalcv_test_options       = array();
+        $icalcv_test_transients    = array();
+        $icalcv_test_http_response = null;
     }
 
     /* ------------------------------------------------------------------
@@ -19,23 +19,23 @@ class WPIcalFetcherUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     private function configureFeed( string $id, string $url, string $username = '', string $password = '' ): void {
-        $passwordEnc = ! empty( $password ) ? WPIcalSettings::encrypt( $password ) : '';
-        update_option( 'wpical_feeds', array(
+        $passwordEnc = ! empty( $password ) ? ICalCVSettings::encrypt( $password ) : '';
+        update_option( 'icalcv_feeds', array(
             $id => array( 'url' => $url, 'username' => $username, 'password' => $passwordEnc ),
         ) );
     }
 
     private function setHttpResponse( int $statusCode, string $body ): void {
-        global $wpical_test_http_response;
-        $wpical_test_http_response = array(
+        global $icalcv_test_http_response;
+        $icalcv_test_http_response = array(
             'response' => array( 'code' => $statusCode ),
             'body'     => $body,
         );
     }
 
     private function setHttpError( string $message ): void {
-        global $wpical_test_http_response;
-        $wpical_test_http_response = new WP_Error( 'http_request_failed', $message );
+        global $icalcv_test_http_response;
+        $icalcv_test_http_response = new WP_Error( 'http_request_failed', $message );
     }
 
     /* ------------------------------------------------------------------
@@ -43,29 +43,29 @@ class WPIcalFetcherUnitTest extends TestCase {
      * ----------------------------------------------------------------*/
 
     public function test_should_returnError_when_feedIdIsEmpty(): void {
-        $result = WPIcalFetcher::fetch( '' );
+        $result = ICalCVFetcher::fetch( '' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
-        $this->assertSame( 'wpical_no_id', $result->get_error_code() );
+        $this->assertSame( 'icalcv_no_id', $result->get_error_code() );
     }
 
     public function test_should_returnError_when_feedIdIsNotConfigured(): void {
-        $result = WPIcalFetcher::fetch( 'unknown-feed' );
+        $result = ICalCVFetcher::fetch( 'unknown-feed' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
-        $this->assertSame( 'wpical_unknown_feed', $result->get_error_code() );
+        $this->assertSame( 'icalcv_unknown_feed', $result->get_error_code() );
         $this->assertStringContainsString( 'unknown-feed', $result->get_error_message() );
     }
 
     public function test_should_returnError_when_feedUrlIsEmpty(): void {
-        update_option( 'wpical_feeds', array(
+        update_option( 'icalcv_feeds', array(
             'empty-url' => array( 'url' => '', 'username' => '', 'password' => '' ),
         ) );
 
-        $result = WPIcalFetcher::fetch( 'empty-url' );
+        $result = ICalCVFetcher::fetch( 'empty-url' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
-        $this->assertSame( 'wpical_no_url', $result->get_error_code() );
+        $this->assertSame( 'icalcv_no_url', $result->get_error_code() );
     }
 
     /* ------------------------------------------------------------------
@@ -77,9 +77,9 @@ class WPIcalFetcherUnitTest extends TestCase {
         $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
 
         // Disable cache so we always hit HTTP.
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertSame( 'BEGIN:VCALENDAR', $result );
     }
@@ -91,9 +91,9 @@ class WPIcalFetcherUnitTest extends TestCase {
     public function test_should_returnWpError_when_httpRequestFails(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
         $this->setHttpError( 'Connection timeout' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
     }
@@ -101,21 +101,21 @@ class WPIcalFetcherUnitTest extends TestCase {
     public function test_should_returnHttpError_when_statusCodeIsNot2xx(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
         $this->setHttpResponse( 401, 'Unauthorized' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
-        $this->assertSame( 'wpical_http_error', $result->get_error_code() );
+        $this->assertSame( 'icalcv_http_error', $result->get_error_code() );
         $this->assertStringContainsString( '401', $result->get_error_message() );
     }
 
     public function test_should_returnHttpError_when_statusIs500(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
         $this->setHttpResponse( 500, 'Internal Server Error' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertInstanceOf( WP_Error::class, $result );
         $this->assertStringContainsString( '500', $result->get_error_message() );
@@ -127,53 +127,53 @@ class WPIcalFetcherUnitTest extends TestCase {
 
     public function test_should_returnCachedResponse_when_transientExists(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
-        update_option( 'wpical_cache_ttl', 3600 );
+        update_option( 'icalcv_cache_ttl', 3600 );
 
         // Pre-populate transient cache.
-        $cacheKey = 'wpical_feed_cache_' . md5( 'team|https://example.com/team.ics' );
-        global $wpical_test_transients;
-        $wpical_test_transients[ $cacheKey ] = 'CACHED:VCALENDAR';
+        $cacheKey = 'icalcv_feed_cache_' . md5( 'team|https://example.com/team.ics' );
+        global $icalcv_test_transients;
+        $icalcv_test_transients[ $cacheKey ] = 'CACHED:VCALENDAR';
 
         // HTTP should NOT be called; set it to error to prove it.
         $this->setHttpError( 'Should not be reached' );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertSame( 'CACHED:VCALENDAR', $result );
     }
 
     public function test_should_skipCache_when_ttlIsZero(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
         $this->setHttpResponse( 200, 'FRESH:VCALENDAR' );
 
-        $result = WPIcalFetcher::fetch( 'team' );
+        $result = ICalCVFetcher::fetch( 'team' );
 
         $this->assertSame( 'FRESH:VCALENDAR', $result );
     }
 
     public function test_should_storeInCache_when_fetchSucceedsAndTtlPositive(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
-        update_option( 'wpical_cache_ttl', 3600 );
+        update_option( 'icalcv_cache_ttl', 3600 );
         $this->setHttpResponse( 200, 'NEW:VCALENDAR' );
 
-        WPIcalFetcher::fetch( 'team' );
+        ICalCVFetcher::fetch( 'team' );
 
-        $cacheKey = 'wpical_feed_cache_' . md5( 'team|https://example.com/team.ics' );
-        global $wpical_test_transients;
-        $this->assertSame( 'NEW:VCALENDAR', $wpical_test_transients[ $cacheKey ] );
+        $cacheKey = 'icalcv_feed_cache_' . md5( 'team|https://example.com/team.ics' );
+        global $icalcv_test_transients;
+        $this->assertSame( 'NEW:VCALENDAR', $icalcv_test_transients[ $cacheKey ] );
     }
 
     public function test_should_notStoreInCache_when_fetchFails(): void {
         $this->configureFeed( 'team', 'https://example.com/team.ics' );
-        update_option( 'wpical_cache_ttl', 3600 );
+        update_option( 'icalcv_cache_ttl', 3600 );
         $this->setHttpResponse( 404, 'Not Found' );
 
-        WPIcalFetcher::fetch( 'team' );
+        ICalCVFetcher::fetch( 'team' );
 
-        $cacheKey = 'wpical_feed_cache_' . md5( 'team|https://example.com/team.ics' );
-        global $wpical_test_transients;
-        $this->assertArrayNotHasKey( $cacheKey, $wpical_test_transients );
+        $cacheKey = 'icalcv_feed_cache_' . md5( 'team|https://example.com/team.ics' );
+        global $icalcv_test_transients;
+        $this->assertArrayNotHasKey( $cacheKey, $icalcv_test_transients );
     }
 
     /* ------------------------------------------------------------------
@@ -182,16 +182,16 @@ class WPIcalFetcherUnitTest extends TestCase {
 
     public function test_should_sendAuthHeader_when_credentialsConfigured(): void {
         $this->configureFeed( 'private', 'https://example.com/private.ics', 'admin', 's3cret' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
         $capturedArgs = null;
-        global $wpical_test_http_response;
-        $wpical_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
+        global $icalcv_test_http_response;
+        $icalcv_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
             $capturedArgs = $args;
             return array( 'response' => array( 'code' => 200 ), 'body' => 'OK' );
         };
 
-        WPIcalFetcher::fetch( 'private' );
+        ICalCVFetcher::fetch( 'private' );
 
         $this->assertNotNull( $capturedArgs );
         $this->assertArrayHasKey( 'headers', $capturedArgs );
@@ -204,16 +204,16 @@ class WPIcalFetcherUnitTest extends TestCase {
 
     public function test_should_notSendAuthHeader_when_noCredentialsConfigured(): void {
         $this->configureFeed( 'public', 'https://example.com/public.ics' );
-        update_option( 'wpical_cache_ttl', 0 );
+        update_option( 'icalcv_cache_ttl', 0 );
 
         $capturedArgs = null;
-        global $wpical_test_http_response;
-        $wpical_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
+        global $icalcv_test_http_response;
+        $icalcv_test_http_response = function ( string $_url, array $args ) use ( &$capturedArgs ) {
             $capturedArgs = $args;
             return array( 'response' => array( 'code' => 200 ), 'body' => 'OK' );
         };
 
-        WPIcalFetcher::fetch( 'public' );
+        ICalCVFetcher::fetch( 'public' );
 
         $this->assertNotNull( $capturedArgs );
         $this->assertArrayNotHasKey( 'headers', $capturedArgs );

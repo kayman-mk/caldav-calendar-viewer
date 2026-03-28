@@ -1,17 +1,17 @@
-/* WordPress iCal Calendar – Front-end Styles */
+/* ICal Calendar View – Front-end Styles */
 
-.wpical-calendar {
+.icalcv-calendar {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     max-width: 960px;
     margin: 0 auto 2rem;
 }
 
 /* Month header */
-.wpical-month {
+.icalcv-month {
     margin-bottom: 2rem;
 }
 
-.wpical-month-title {
+.icalcv-month-title {
     text-align: center;
     font-size: 1.3rem;
     margin-bottom: 0.5rem;
@@ -19,13 +19,13 @@
 }
 
 /* Table grid */
-.wpical-table {
+.icalcv-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
 }
 
-.wpical-table th {
+.icalcv-table th {
     background: #2271b1;
     color: #fff;
     text-align: center;
@@ -34,7 +34,7 @@
     font-weight: 600;
 }
 
-.wpical-table td {
+.icalcv-table td {
     border: 1px solid #dcdcde;
     vertical-align: top;
     padding: 4px;
@@ -43,12 +43,12 @@
     background: #fff;
 }
 
-.wpical-empty {
+.icalcv-empty {
     background: #f6f7f7 !important;
 }
 
 /* Day number */
-.wpical-day-number {
+.icalcv-day-number {
     display: block;
     font-weight: 600;
     font-size: 0.85rem;
@@ -57,11 +57,11 @@
 }
 
 /* Today highlight */
-.wpical-today {
+.icalcv-today {
     background: #e7f5fe !important;
 }
 
-.wpical-today .wpical-day-number {
+.icalcv-today .icalcv-day-number {
     color: #2271b1;
     border-bottom: 2px solid #2271b1;
     display: inline-block;
@@ -69,17 +69,17 @@
 }
 
 /* Events */
-.wpical-has-events {
+.icalcv-has-events {
     cursor: default;
 }
 
-.wpical-events {
+.icalcv-events {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.wpical-event {
+.icalcv-event {
     background: #2271b1;
     color: #fff;
     border-radius: 3px;
@@ -91,27 +91,27 @@
     white-space: nowrap;
 }
 
-.wpical-event a {
+.icalcv-event a {
     color: #fff;
     text-decoration: none;
 }
 
-.wpical-event a:hover {
+.icalcv-event a:hover {
     text-decoration: underline;
 }
 
-.wpical-event-time {
+.icalcv-event-time {
     font-weight: 600;
 }
 
-.wpical-event-location {
+.icalcv-event-location {
     opacity: 0.85;
     font-style: italic;
 }
 
 /* Error & empty states */
-.wpical-error,
-.wpical-no-events {
+.icalcv-error,
+.icalcv-no-events {
     padding: 1rem;
     border-left: 4px solid #d63638;
     background: #fcf0f1;
@@ -119,24 +119,24 @@
     margin: 1rem 0;
 }
 
-.wpical-no-events {
+.icalcv-no-events {
     border-left-color: #dba617;
     background: #fcf9e8;
 }
 
 /* Responsive */
 @media (max-width: 600px) {
-    .wpical-table th,
-    .wpical-table td {
+    .icalcv-table th,
+    .icalcv-table td {
         padding: 2px;
         font-size: 0.75rem;
     }
 
-    .wpical-event {
+    .icalcv-event {
         font-size: 0.6rem;
     }
 
-    .wpical-table td {
+    .icalcv-table td {
         height: 60px;
     }
 }

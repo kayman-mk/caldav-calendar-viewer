@@ -1,4 +1,4 @@
-# WordPress iCal Calendar
+# ICal Calendar View
 
 A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthly calendar view. Supports multiple feeds with configurable username and password per feed.
 
@@ -9,7 +9,7 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthl
 - **Basic Authentication** – Supports username/password per feed for protected calendar endpoints.
 - **Encrypted Credentials** – Passwords are stored encrypted (AES-256-CBC) in the database.
 - **Caching** – Configurable cache lifetime to reduce external requests (defaults to 1 hour).
-- **Shortcode** – Display any feed anywhere via `[wpical_calendar id="my-feed"]`.
+- **Shortcode** – Display any feed anywhere via `[icalcv_calendar id="my-feed"]`.
 - **7-Day Window** – Always fetches and displays only the next 7 days of events.
 - **Responsive Design** – Month-grid layout adapts to mobile screens.
 - **Tooltips** – Hover over events to see their description.
@@ -22,11 +22,11 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthl
    git clone <repository-url> wordpress-ical-calendar
    ```
 2. Activate the plugin via **Plugins → Installed Plugins** in the WordPress admin.
-3. Navigate to **Settings → iCal Calendar** to configure your feeds.
+3. Navigate to **Settings → ICal Calendar View** to configure your feeds.
 
 ## Configuration
 
-Go to **Settings → iCal Calendar** in the WordPress admin panel.
+Go to **Settings → ICal Calendar View** in the WordPress admin panel.
 
 ### Adding a Feed
 
@@ -54,21 +54,21 @@ You can add multiple feeds — each one gets its own ID.
 Reference a configured feed by its ID:
 
 ```
-[wpical_calendar id="my-feed"]
+[icalcv_calendar id="my-feed"]
 ```
 
 ### Shortcode Attributes
 
 | Attribute | Required | Default | Description                                       |
 |-----------|----------|---------|---------------------------------------------------|
-| `id`      | **yes**  | —       | The feed ID configured in Settings → iCal Calendar. |
+| `id`      | **yes**  | —       | The feed ID configured in Settings → ICal Calendar View. |
 | `months`  | no       | `2`     | Number of months to render in the grid.            |
 
 **Examples:**
 
 ```
-[wpical_calendar id="team-calendar"]
-[wpical_calendar id="hr-events" months="1"]
+[icalcv_calendar id="team-calendar"]
+[icalcv_calendar id="hr-events" months="1"]
 ```
 
 ## File Structure
@@ -77,15 +77,15 @@ Reference a configured feed by its ID:
 wordpress-ical-calendar/
 ├── wordpress-ical-calendar.php   # Main plugin bootstrap
 ├── includes/
-│   ├── class-wpical-settings.php # Admin settings page (multi-feed) & encryption helpers
-│   ├── class-wpical-fetcher.php  # HTTP fetcher with auth & caching (by feed ID)
-│   ├── class-wpical-parser.php   # iCal RFC 5545 parser with date-range filtering
-│   └── class-wpical-shortcode.php# [wpical_calendar] shortcode renderer
+│   ├── class-icalcv-settings.php # Admin settings page (multi-feed) & encryption helpers
+│   ├── class-icalcv-fetcher.php  # HTTP fetcher with auth & caching (by feed ID)
+│   ├── class-icalcv-parser.php   # iCal RFC 5545 parser with date-range filtering
+│   └── class-icalcv-shortcode.php# [icalcv_calendar] shortcode renderer
 ├── tests/
 │   ├── bootstrap.php             # WP function stubs for standalone testing
-│   ├── WPIcalParserUnitTest.php  # Parser unit tests
-│   ├── WPIcalSettingsUnitTest.php# Settings unit tests
-│   └── WPIcalFetcherUnitTest.php # Fetcher unit tests
+│   ├── ICalCVParserUnitTest.php  # Parser unit tests
+│   ├── ICalCVSettingsUnitTest.php# Settings unit tests
+│   └── ICalCVFetcherUnitTest.php # Fetcher unit tests
 ├── assets/
 │   ├── css/
 │   │   └── calendar.css          # Front-end calendar styles

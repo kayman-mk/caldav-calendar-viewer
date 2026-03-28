@@ -3,9 +3,9 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for the WPIcalParser class.
+ * Unit tests for the ICalCVParser class.
  */
-class WPIcalParserUnitTest extends TestCase {
+class ICalCVParserUnitTest extends TestCase {
 
     /* ------------------------------------------------------------------
      * Helpers
@@ -38,13 +38,13 @@ class WPIcalParserUnitTest extends TestCase {
     public function test_should_returnEmptyArray_when_inputContainsNoEvents(): void {
         $ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR";
 
-        $result = WPIcalParser::parse( $ical );
+        $result = ICalCVParser::parse( $ical );
 
         $this->assertSame( array(), $result );
     }
 
     public function test_should_returnEmptyArray_when_inputIsEmptyString(): void {
-        $result = WPIcalParser::parse( '' );
+        $result = ICalCVParser::parse( '' );
 
         $this->assertSame( array(), $result );
     }
@@ -62,7 +62,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
 
@@ -89,7 +89,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 2, $events );
     }
@@ -101,7 +101,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 0, $events );
     }
@@ -117,7 +117,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'SUMMARY' => 'Middle', 'DTSTART' => '20260329T120000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( 'Earlier', $events[0]['summary'] );
         $this->assertSame( 'Middle', $events[1]['summary'] );
@@ -137,7 +137,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
         $this->assertTrue( $events[0]['all_day'] );
@@ -157,7 +157,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( '2026-03-15 14:30', $events[0]['dtstart'] );
     }
@@ -170,7 +170,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( '2026-06-01 18:00', $events[0]['dtstart'] );
     }
@@ -186,7 +186,7 @@ class WPIcalParserUnitTest extends TestCase {
                . "END:VEVENT";
 
         $ical   = $this->buildIcal( $event );
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
         $this->assertSame( '2026-04-01 09:00', $events[0]['dtstart'] );
@@ -205,7 +205,7 @@ class WPIcalParserUnitTest extends TestCase {
               . "END:VEVENT\r\n"
               . "END:VCALENDAR";
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'Very long subject line here', $events[0]['summary'] );
@@ -220,7 +220,7 @@ class WPIcalParserUnitTest extends TestCase {
               . "END:VEVENT\r\n"
               . "END:VCALENDAR";
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( 'Tabbed subject', $events[0]['summary'] );
     }
@@ -238,7 +238,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( "Line one\nLine two\nLine three", $events[0]['description'] );
     }
@@ -251,7 +251,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertSame( 'Hello, World; Path\\Foo', $events[0]['summary'] );
     }
@@ -266,7 +266,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'SUMMARY' => 'B', 'DTSTART' => '20271231T090000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 2, $events );
     }
@@ -277,7 +277,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'SUMMARY' => 'New', 'DTSTART' => '20260401T090000Z', 'DTEND' => '20260401T100000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27' );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'New', $events[0]['summary'] );
@@ -289,7 +289,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'SUMMARY' => 'After', 'DTSTART' => '20260404T090000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '', '2026-04-03' );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'Before', $events[0]['summary'] );
@@ -302,7 +302,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'SUMMARY' => 'Too Late', 'DTSTART' => '20260410T090000Z', 'DTEND' => '20260410T100000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27', '2026-04-03' );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'In Range', $events[0]['summary'] );
@@ -317,7 +317,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27', '2026-04-03' );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'Multi-day', $events[0]['summary'] );
@@ -332,7 +332,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27', '2026-04-03' );
 
         $this->assertCount( 0, $events );
     }
@@ -346,7 +346,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27', '2026-04-03' );
 
         $this->assertCount( 0, $events );
     }
@@ -359,7 +359,7 @@ class WPIcalParserUnitTest extends TestCase {
             ) )
         );
 
-        $events = WPIcalParser::parse( $ical, '2026-03-27', '2026-04-03' );
+        $events = ICalCVParser::parse( $ical, '2026-03-27', '2026-04-03' );
 
         $this->assertCount( 1, $events );
     }
@@ -371,7 +371,7 @@ class WPIcalParserUnitTest extends TestCase {
     public function test_should_parseCorrectly_when_inputUsesBareCrLineEndings(): void {
         $ical = "BEGIN:VCALENDAR\rVERSION:2.0\rBEGIN:VEVENT\rSUMMARY:CR Event\rDTSTART:20260327T090000Z\rEND:VEVENT\rEND:VCALENDAR";
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
         $this->assertSame( 'CR Event', $events[0]['summary'] );
@@ -386,7 +386,7 @@ class WPIcalParserUnitTest extends TestCase {
             $this->buildEvent( array( 'DTSTART' => '20260327T090000Z' ) )
         );
 
-        $events = WPIcalParser::parse( $ical );
+        $events = ICalCVParser::parse( $ical );
 
         $this->assertCount( 1, $events );
         $this->assertSame( '', $events[0]['summary'] );

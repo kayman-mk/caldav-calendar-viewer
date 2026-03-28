@@ -1,23 +1,23 @@
 <?php
 /**
- * Registers the [wpical_calendar] shortcode and renders the calendar HTML.
+ * Registers the [icalcv_calendar] shortcode and renders the calendar HTML.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WPIcalShortcode {
+class ICalCVShortcode {
 
     public function __construct() {
-        add_shortcode( 'wpical_calendar', array( $this, 'render' ) );
+        add_shortcode( 'icalcv_calendar', array( $this, 'render' ) );
     }
 
     /**
-     * Shortcode handler for [wpical_calendar].
+     * Shortcode handler for [icalcv_calendar].
      *
      * Attributes:
-     *   id     – references a feed configured in Settings → iCal Calendar (required)
+     *   id     – references a feed configured in Settings → ICal Calendar View (required)
      *   months – number of months to display (default 2)
      *
      * @param array|string $atts Shortcode attributes.
@@ -27,10 +27,10 @@ class WPIcalShortcode {
         $atts = shortcode_atts( array(
             'id'     => '',
             'months' => 2,
-        ), $atts, 'wpical_calendar' );
+        ), $atts, 'icalcv_calendar' );
 
-        wp_enqueue_style( 'wpical-calendar-style' );
-        wp_enqueue_script( 'wpical-calendar-script' );
+        wp_enqueue_style( 'icalcv-calendar-style' );
+        wp_enqueue_script( 'icalcv-calendar-script' );
 
         $monthsToShow = min( 12, max( 1, (int) $atts['months'] ) );
 
@@ -41,23 +41,23 @@ class WPIcalShortcode {
         $rangeEnd   = $today->modify( '+7 days' )->format( 'Y-m-d' );
 
         $feedId   = sanitize_key( $atts['id'] );
-        $icalBody = WPIcalFetcher::fetch( $feedId );
+        $icalBody = ICalCVFetcher::fetch( $feedId );
 
         if ( is_wp_error( $icalBody ) ) {
             if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
                 // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-                error_log( 'wpical_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
+                error_log( 'icalcv_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
             }
-            return '<div class="wpical-error">'
-                . esc_html__( 'Unable to load calendar. Please try again later.', 'wp-ical-calendar' )
+            return '<div class="icalcv-error">'
+                . esc_html__( 'Unable to load calendar. Please try again later.', 'ical-calendar-view' )
                 . '</div>';
         }
 
-        $events = WPIcalParser::parse( $icalBody, $rangeStart, $rangeEnd );
+        $events = ICalCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
 
         if ( empty( $events ) ) {
-            return '<div class="wpical-no-events">'
-                . esc_html__( 'No upcoming events found.', 'wp-ical-calendar' )
+            return '<div class="icalcv-no-events">'
+                . esc_html__( 'No upcoming events found.', 'ical-calendar-view' )
                 . '</div>';
         }
 
@@ -67,7 +67,7 @@ class WPIcalShortcode {
     /**
      * Build a month-grid calendar HTML for the given events.
      *
-     * @param array $events       Parsed events from WPIcalParser.
+     * @param array $events       Parsed events from ICalCVParser.
      * @param int   $monthsToShow Number of months to render.
      * @return string HTML markup.
      */
@@ -81,7 +81,7 @@ class WPIcalShortcode {
         $today = new DateTimeImmutable( 'today', wp_timezone() );
 
         ob_start();
-        echo '<div class="wpical-calendar">';
+        echo '<div class="icalcv-calendar">';
 
         for ( $m = 0; $m < $monthsToShow; $m++ ) {
             $monthStart = $today->modify( "first day of +{$m} month" );
@@ -118,18 +118,18 @@ class WPIcalShortcode {
      */
     private function renderMonthHeader( string $monthLabel ): void {
         $weekdays = array(
-            __( 'Mon', 'wp-ical-calendar' ),
-            __( 'Tue', 'wp-ical-calendar' ),
-            __( 'Wed', 'wp-ical-calendar' ),
-            __( 'Thu', 'wp-ical-calendar' ),
-            __( 'Fri', 'wp-ical-calendar' ),
-            __( 'Sat', 'wp-ical-calendar' ),
-            __( 'Sun', 'wp-ical-calendar' ),
+            __( 'Mon', 'ical-calendar-view' ),
+            __( 'Tue', 'ical-calendar-view' ),
+            __( 'Wed', 'ical-calendar-view' ),
+            __( 'Thu', 'ical-calendar-view' ),
+            __( 'Fri', 'ical-calendar-view' ),
+            __( 'Sat', 'ical-calendar-view' ),
+            __( 'Sun', 'ical-calendar-view' ),
         );
         ?>
-        <div class="wpical-month">
-            <h3 class="wpical-month-title"><?php echo esc_html( $monthLabel ); ?></h3>
-            <table class="wpical-table">
+        <div class="icalcv-month">
+            <h3 class="icalcv-month-title"><?php echo esc_html( $monthLabel ); ?></h3>
+            <table class="icalcv-table">
                 <thead>
                     <tr>
                         <?php foreach ( $weekdays as $wd ) : ?>
@@ -160,7 +160,7 @@ class WPIcalShortcode {
             echo '<tr>';
             for ( $col = 1; $col <= 7; $col++, $cell++ ) {
                 if ( $cell < $firstWeekday || $dayCounter > $daysInMonth ) {
-                    echo '<td class="wpical-empty"></td>';
+                    echo '<td class="icalcv-empty"></td>';
                 } else {
                     $dateStr = sprintf( '%04d-%02d-%02d', $year, $month, $dayCounter );
                     $this->renderDayCell( $dateStr, $dayCounter, $todayStr, $eventsByDate );
@@ -185,19 +185,19 @@ class WPIcalShortcode {
         $hasEvents = isset( $eventsByDate[ $dateStr ] );
         $isToday   = ( $dateStr === $todayStr );
 
-        $classes = 'wpical-day';
+        $classes = 'icalcv-day';
         if ( $hasEvents ) {
-            $classes .= ' wpical-has-events';
+            $classes .= ' icalcv-has-events';
         }
         if ( $isToday ) {
-            $classes .= ' wpical-today';
+            $classes .= ' icalcv-today';
         }
 
         echo '<td class="' . esc_attr( $classes ) . '">';
-        echo '<span class="wpical-day-number">' . esc_html( $dayNumber ) . '</span>';
+        echo '<span class="icalcv-day-number">' . esc_html( $dayNumber ) . '</span>';
 
         if ( $hasEvents ) {
-            echo '<div class="wpical-events">';
+            echo '<div class="icalcv-events">';
             foreach ( $eventsByDate[ $dateStr ] as $ev ) {
                 $this->renderEventItem( $ev );
             }
@@ -218,17 +218,17 @@ class WPIcalShortcode {
             $time = substr( $ev['dtstart'], 11 ) . ' ';
         }
 
-        echo '<div class="wpical-event" title="' . esc_attr( wp_strip_all_tags( $ev['description'] ) ) . '">';
+        echo '<div class="icalcv-event" title="' . esc_attr( wp_strip_all_tags( $ev['description'] ) ) . '">';
 
         if ( ! empty( $ev['url'] ) ) {
             echo '<a href="' . esc_url( $ev['url'] ) . '" target="_blank" rel="noopener">';
         }
 
-        echo '<span class="wpical-event-time">' . esc_html( $time ) . '</span>';
-        echo '<span class="wpical-event-title">' . esc_html( $ev['summary'] ) . '</span>';
+        echo '<span class="icalcv-event-time">' . esc_html( $time ) . '</span>';
+        echo '<span class="icalcv-event-title">' . esc_html( $ev['summary'] ) . '</span>';
 
         if ( ! empty( $ev['location'] ) ) {
-            echo '<span class="wpical-event-location"> — ' . esc_html( $ev['location'] ) . '</span>';
+            echo '<span class="icalcv-event-location"> — ' . esc_html( $ev['location'] ) . '</span>';
         }
 
         if ( ! empty( $ev['url'] ) ) {

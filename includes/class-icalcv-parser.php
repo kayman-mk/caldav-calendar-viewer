@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WPIcalParser {
+class ICalCVParser {
 
     /**
      * Parse raw iCal text into an array of events.

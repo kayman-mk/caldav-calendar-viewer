@@ -83,11 +83,16 @@ class ICalCVSettings {
                 continue;
             }
 
+            $url = isset( $feed['url'] ) ? esc_url_raw( $feed['url'], array( 'http', 'https' ) ) : '';
+            if ( empty( $url ) ) {
+                continue;
+            }
+
             // Keep existing encrypted password when the field is left empty.
             $existing = self::getFeed( $id );
 
             $clean[ $id ] = array(
-                'url'      => isset( $feed['url'] ) ? esc_url_raw( $feed['url'], array( 'http', 'https' ) ) : '',
+                'url'      => $url,
                 'username' => isset( $feed['username'] ) ? sanitize_text_field( $feed['username'] ) : '',
                 'password' => isset( $feed['password'] ) && $feed['password'] !== ''
                     ? self::encrypt( $feed['password'] )
@@ -256,7 +261,7 @@ class ICalCVSettings {
                     <input type="url" id="<?php echo esc_attr( $idPrefix . 'url' ); ?>"
                            name="<?php echo esc_attr( $namePrefix . '[url]' ); ?>"
                            value="<?php echo esc_attr( $feed['url'] ?? '' ); ?>"
-                           class="regular-text" placeholder="https://example.com/calendar.ics" />
+                           class="regular-text" placeholder="https://example.com/calendar.ics" required />
                 </div>
                 <div class="icalcv-feed-field">
                     <label for="<?php echo esc_attr( $idPrefix . 'username' ); ?>"><?php esc_html_e( 'Username', 'ical-calendar-view' ); ?></label>

@@ -121,7 +121,7 @@ class CalDavCVFetcher {
      */
     private static function executeRequest( string $url, string $username, string $password ) {
         $args = array(
-            'timeout'             => 30,
+            'timeout'             => 7,
             'sslverify'           => true,
             'limit_response_size' => self::MAX_RESPONSE_SIZE,
         );

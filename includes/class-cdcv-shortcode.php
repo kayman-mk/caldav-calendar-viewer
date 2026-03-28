@@ -29,34 +29,25 @@ class CalDavCVShortcode {
 
         wp_enqueue_style( 'cdcv-calendar-style' );
         wp_enqueue_script( 'cdcv-calendar-script' );
+        wp_enqueue_script( 'cdcv-calendar-async', CDCV_PLUGIN_URL . 'assets/js/calendar-async.js', array(), CDCV_VERSION, true );
 
-        $tz         = wp_timezone();
-        $today      = new DateTimeImmutable( 'today', $tz );
-        $rangeStart = $today->format( 'Y-m-d' );
-        $rangeEnd   = $today->modify( '+7 days' )->format( 'Y-m-d' );
-
-        $feedId   = sanitize_key( $atts['id'] );
-        $icalBody = CalDavCVFetcher::fetch( $feedId );
-
-        if ( is_wp_error( $icalBody ) ) {
-            if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-                error_log( 'cdcv_calendar: ' . $icalBody->get_error_code() . ' – ' . $icalBody->get_error_message() );
-            }
-            return '<div class="cdcv-error">'
-                . esc_html__( 'Unable to load calendar. Please try again later.', 'caldav-calendar-viewer' )
-                . '</div>';
+        $feedId = sanitize_key( $atts['id'] );
+        if ( empty( $feedId ) ) {
+            return '<div class="cdcv-error">' . esc_html__( 'No feed ID provided.', 'caldav-calendar-viewer' ) . '</div>';
         }
 
-        $events = CalDavCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
+        $containerId = 'cdcv-calendar-' . uniqid();
+        $nonce = wp_create_nonce( 'cdcv_get_calendar' );
+        // Pass AJAX URL and nonce to JS
+        wp_localize_script( 'cdcv-calendar-async', 'cdcvAsyncCalendar', array(
+            'ajax_url' => admin_url( 'admin-ajax.php' ),
+        ) );
 
-        if ( empty( $events ) ) {
-            return '<div class="cdcv-no-events">'
-                . esc_html__( 'No upcoming events found.', 'caldav-calendar-viewer' )
-                . '</div>';
-        }
-
-        return $this->buildEventListHtml( $events );
+        // Output placeholder div for async loading
+        $html = '<div id="' . esc_attr( $containerId ) . '" class="cdcv-calendar-async" data-feed-id="' . esc_attr( $feedId ) . '" data-nonce="' . esc_attr( $nonce ) . '">'
+            . '<div class="cdcv-loading">' . esc_html__( 'Loading calendar…', 'caldav-calendar-viewer' ) . '</div>'
+            . '</div>';
+        return $html;
     }
 
     /**
@@ -65,7 +56,7 @@ class CalDavCVShortcode {
      * @param array $events Parsed events from CalDavCVParser.
      * @return string HTML markup.
      */
-    private function buildEventListHtml( array $events ): string {
+    public function buildEventListHtml( array $events ): string {
         $eventsByDate = array();
         foreach ( $events as $event ) {
             $dateKey = substr( $event['dtstart'], 0, 10 );

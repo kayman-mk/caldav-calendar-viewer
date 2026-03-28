@@ -52,13 +52,11 @@ class ICalCVSettings {
         register_setting( self::PAGE_SLUG, self::OPT_FEEDS, array(
             'type'              => 'array',
             'sanitize_callback' => array( $this, 'sanitizeFeeds' ),
-            'default'           => array(),
         ) );
 
         register_setting( self::PAGE_SLUG, self::OPT_CACHE_TTL, array(
             'type'              => 'integer',
             'sanitize_callback' => 'absint',
-            'default'           => 3600,
         ) );
     }
 
@@ -93,7 +91,7 @@ class ICalCVSettings {
                 'username' => isset( $feed['username'] ) ? sanitize_text_field( $feed['username'] ) : '',
                 'password' => isset( $feed['password'] ) && $feed['password'] !== ''
                     ? self::encrypt( $feed['password'] )
-                    : ( $existing['password_enc'] ?? '' ),
+                    : ( null !== $existing ? $existing['password_enc'] : '' ),
             );
         }
 

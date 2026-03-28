@@ -4,7 +4,7 @@
  * Plugin URI:  https://github.com/kayman-mk/ical-calendar-view
  * Description: Displays events from an iCal (.ics) feed in a calendar view. Supports authenticated (username/password) iCal endpoints.
  * Version:     1.0.0
- * Author:      kayman-mk
+ * Author:      kaymanmk
  * License:     GPL-2.0-or-later
  * Text Domain: ical-calendar-view
  */

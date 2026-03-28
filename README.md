@@ -11,7 +11,7 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean monthl
 - **Caching** – Configurable cache lifetime to reduce external requests (defaults to 1 hour).
 - **Shortcode** – Display any feed anywhere via `[icalcv_calendar id="my-feed"]`.
 - **7-Day Window** – Always fetches and displays only the next 7 days of events.
-- **Responsive Design** – Month-grid layout adapts to mobile screens.
+- **Responsive Design** – Clean event list adapts to mobile screens.
 - **Tooltips** – Hover over events to see their description.
 
 ## Installation
@@ -62,13 +62,12 @@ Reference a configured feed by its ID:
 | Attribute | Required | Default | Description                                       |
 |-----------|----------|---------|---------------------------------------------------|
 | `id`      | **yes**  | —       | The feed ID configured in Settings → ICal Calendar View. |
-| `months`  | no       | `2`     | Number of months to render in the grid.            |
 
 **Examples:**
 
 ```
 [icalcv_calendar id="team-calendar"]
-[icalcv_calendar id="hr-events" months="1"]
+[icalcv_calendar id="hr-events"]
 ```
 
 ## File Structure

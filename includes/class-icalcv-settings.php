@@ -172,8 +172,7 @@ class ICalCVSettings {
             <h2><?php esc_html_e( 'Usage', 'ical-calendar-view' ); ?></h2>
             <p><?php esc_html_e( 'Add the following shortcode to any page or post, referencing a feed by its ID:', 'ical-calendar-view' ); ?></p>
             <code>[icalcv_calendar id="my-feed"]</code>
-            <p><?php esc_html_e( 'Optional: set how many months to display:', 'ical-calendar-view' ); ?></p>
-            <code>[icalcv_calendar id="my-feed" months="3"]</code>
+            <p class="description"><?php esc_html_e( 'Displays upcoming events from the next 7 days as a list.', 'ical-calendar-view' ); ?></p>
 
             <?php if ( ! empty( $feeds ) ) : ?>
                 <h3><?php esc_html_e( 'Configured Feed IDs', 'ical-calendar-view' ); ?></h3>

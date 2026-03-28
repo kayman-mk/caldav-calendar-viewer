@@ -22,7 +22,7 @@ ICal Calendar View fetches and displays events from any standard iCal (.ics) fee
 * **Encrypted Credentials** – Passwords are stored using AES-256-CBC encryption in the database.
 * **Caching** – Configurable cache lifetime reduces external HTTP requests (defaults to 1 hour).
 * **7-Day Rolling Window** – Automatically fetches and displays only the next 7 days of events.
-* **Responsive Month Grid** – Clean calendar layout that adapts to all screen sizes.
+* **Responsive Event List** – Clean event list layout that adapts to all screen sizes.
 * **Event Tooltips** – Hover over an event to see its description.
 
 == Installation ==
@@ -60,13 +60,12 @@ You can configure multiple feeds — each gets its own ID.
 = Shortcode Attributes =
 
 * `id` (required) – The feed ID configured in **Settings → ICal Calendar View**.
-* `months` (optional, default: `2`) – Number of months to display in the calendar grid.
 
 = Examples =
 
 `[icalcv_calendar id="team-calendar"]`
 
-`[icalcv_calendar id="hr-events" months="1"]`
+`[icalcv_calendar id="hr-events"]`
 
 == Frequently Asked Questions ==
 
@@ -100,7 +99,7 @@ Yes. The calendar uses CSS classes prefixed with `icalcv-` that you can override
 == Screenshots ==
 
 1. Admin settings page with multiple feed configuration.
-2. Calendar month-grid view on the front end.
+2. 7-day event list view on the front end.
 3. Event tooltip showing the event description on hover.
 
 == Changelog ==
@@ -109,8 +108,8 @@ Yes. The calendar uses CSS classes prefixed with `icalcv-` that you can override
 * Initial release.
 * Multiple iCal feed support with per-feed URL, username, and password.
 * AES-256-CBC encrypted password storage.
-* `[icalcv_calendar]` shortcode with `id` and `months` attributes.
-* Responsive month-grid calendar layout.
+* `[icalcv_calendar]` shortcode with `id` attribute.
+* 7-day event list view.
 * 7-day rolling event fetch window.
 * Configurable transient cache.
 * Event tooltips on hover.

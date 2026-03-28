@@ -10,27 +10,23 @@
         xhr.open('POST', cdcvAsyncCalendar.ajax_url, true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function () {
-            var debugInfo = '';
             try {
                 var resp = JSON.parse(xhr.responseText);
-                if (resp.debug) {
-                    debugInfo = '<pre class="cdcv-debug">' + JSON.stringify(resp.debug, null, 2) + '</pre>';
-                }
                 if (xhr.status === 200) {
                     if (resp.success) {
-                        container.innerHTML = resp.data.html + debugInfo;
+                        container.innerHTML = resp.data.html;
                     } else {
-                        container.innerHTML = '<div class="cdcv-error">' + (resp.data && resp.data.message ? resp.data.message : 'Unable to load calendar z.') + '</div>' + debugInfo;
+                        container.innerHTML = '<div class="cdcv-error">' + (resp.data && resp.data.message ? resp.data.message : 'Unable to load calendar.') + '</div>';
                     }
                 } else {
-                    container.innerHTML = '<div class="cdcv-error">Unable to load calendar x.</div>' + debugInfo;
+                    container.innerHTML = '<div class="cdcv-error">Unable to load calendar.</div>';
                 }
             } catch (e) {
-                container.innerHTML = '<div class="cdcv-error">Unable to load calendar v.<br>Status: ' + xhr.status + '<br>Response: <pre>' + xhr.responseText + '</pre></div>' + debugInfo;
+                container.innerHTML = '<div class="cdcv-error">Unable to load calendar.<br>Status: ' + xhr.status + '</div>';
             }
         };
         xhr.onerror = function () {
-            container.innerHTML = '<div class="cdcv-error">Unable to load calendar a.<br>Status: ' + xhr.status + '<br>Response: <pre>' + xhr.responseText + '</pre></div>';
+            container.innerHTML = '<div class="cdcv-error">Unable to load calendar.<br>Status: ' + xhr.status + '</div>';
         };
         xhr.send('action=cdcv_get_calendar&feed_id=' + encodeURIComponent(feedId) + '&nonce=' + encodeURIComponent(nonce));
     }

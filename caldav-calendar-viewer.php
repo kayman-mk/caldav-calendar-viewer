@@ -83,17 +83,14 @@ add_action( 'wp_ajax_nopriv_cdcv_get_calendar', 'cdcv_ajax_get_calendar' );
 
 function cdcv_ajax_get_calendar() {
     if ( ! isset( $_POST['feed_id'], $_POST['nonce'] ) ) {
-        $debug = array('step' => 'missing_params', 'post' => $_POST);
-        wp_send_json_error( array( 'message' => __( 'Missing parameters.', 'caldav-calendar-viewer' ), 'debug' => $debug ) );
+        wp_send_json_error( array( 'message' => __( 'Missing parameters.', 'caldav-calendar-viewer' ) ) );
     }
     $feed_id = sanitize_key( $_POST['feed_id'] );
     if ( ! wp_verify_nonce( $_POST['nonce'], 'cdcv_get_calendar' ) ) {
-        $debug = array('step' => 'invalid_nonce', 'nonce' => $_POST['nonce']);
-        wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'caldav-calendar-viewer' ), 'debug' => $debug ) );
+        wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'caldav-calendar-viewer' ) ) );
     }
     if ( empty( $feed_id ) ) {
-        $debug = array('step' => 'empty_feed_id');
-        wp_send_json_error( array( 'message' => __( 'No feed ID provided.', 'caldav-calendar-viewer' ), 'debug' => $debug ) );
+        wp_send_json_error( array( 'message' => __( 'No feed ID provided.', 'caldav-calendar-viewer' ) ) );
     }
     $tz         = wp_timezone();
     $today      = new DateTimeImmutable( 'today', $tz );
@@ -101,23 +98,14 @@ function cdcv_ajax_get_calendar() {
     $rangeEnd   = $today->modify( '+7 days' )->format( 'Y-m-d' );
     $icalBody   = CalDavCVFetcher::fetch( $feed_id );
     if ( is_wp_error( $icalBody ) ) {
-        $debug = array(
-            'step' => 'fetch_error',
-            'error_code' => $icalBody->get_error_code(),
-            'error_message' => $icalBody->get_error_message(),
-            'feed_id' => $feed_id
-        );
-        error_log( 'cdcv_ajax_get_calendar fetch error: ' . print_r( $debug, true ) );
-        wp_send_json_error( array( 'message' => __( 'Unable to load calendar. Please try again later.', 'caldav-calendar-viewer' ), 'debug' => $debug ) );
+        wp_send_json_error( array( 'message' => __( 'Unable to load calendar. Please try again later.', 'caldav-calendar-viewer' ) ) );
     }
     $events = CalDavCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
     if ( empty( $events ) ) {
-        $debug = array('step' => 'no_events', 'feed_id' => $feed_id);
         $html = '<div class="cdcv-no-events">' . esc_html__( 'No upcoming events found.', 'caldav-calendar-viewer' ) . '</div>';
     } else {
-        $debug = array('step' => 'success', 'event_count' => count($events), 'feed_id' => $feed_id);
         $shortcode = new CalDavCVShortcode();
         $html = $shortcode->buildEventListHtml( $events );
     }
-    wp_send_json_success( array( 'html' => $html, 'debug' => $debug ) );
+    wp_send_json_success( array( 'html' => $html ) );
 }

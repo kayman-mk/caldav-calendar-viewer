@@ -236,7 +236,9 @@ class CalDavCVParser {
                     break;
                 case 'CATEGORIES':
                     // CATEGORIES values are comma-separated; multiple CATEGORIES lines accumulate.
-                    foreach ( explode( ',', $value ) as $cat ) {
+                    // Split only on unescaped commas (not preceded by \) so that \, inside a
+                    // category name is preserved as a literal comma after unescaping.
+                    foreach ( preg_split( '/(?<!\\\\),/', $value ) as $cat ) {
                         $cat = trim( self::unescape( $cat ) );
                         if ( '' !== $cat ) {
                             $event['categories'][] = $cat;

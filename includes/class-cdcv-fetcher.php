@@ -12,6 +12,9 @@ class CalDavCVFetcher {
     /** Transient key prefix used for caching. */
     private const CACHE_KEY = 'cdcv_feed_cache';
 
+    /** Option key used to track all active cache transient names. */
+    private const CACHE_KEY_REGISTRY = 'cdcv_cache_key_registry';
+
     /** Maximum allowed response body size in bytes (2 MB). */
     private const MAX_RESPONSE_SIZE = 2 * 1024 * 1024;
 
@@ -93,7 +96,14 @@ class CalDavCVFetcher {
         $cacheKey = self::CACHE_KEY . '_' . md5( $feedId . '|' . $url );
         $cached   = get_transient( $cacheKey );
 
-        return ( false !== $cached ) ? $cached : null;
+        if ( false !== $cached ) {
+            // Ensure the key is tracked even when the transient pre-dates the registry
+            // (e.g. after a plugin update) or was read before the write path ran.
+            self::registerCacheKey( $cacheKey );
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
@@ -108,7 +118,63 @@ class CalDavCVFetcher {
         if ( $cacheTtl > 0 ) {
             $cacheKey = self::CACHE_KEY . '_' . md5( $feedId . '|' . $url );
             set_transient( $cacheKey, $body, $cacheTtl );
+            self::registerCacheKey( $cacheKey );
         }
+    }
+
+    /**
+     * Record a transient key in the persistent registry so it can be counted
+     * and deleted later without a direct database query.
+     *
+     * @param string $cacheKey Transient name (without the _transient_ prefix).
+     */
+    private static function registerCacheKey( string $cacheKey ): void {
+        $registry = get_option( self::CACHE_KEY_REGISTRY, array() );
+        if ( ! is_array( $registry ) ) {
+            $registry = array();
+        }
+        if ( ! in_array( $cacheKey, $registry, true ) ) {
+            $registry[] = $cacheKey;
+            update_option( self::CACHE_KEY_REGISTRY, $registry, false );
+        }
+    }
+
+    /**
+     * Return the number of calendar feed responses currently held in the cache.
+     *
+     * Entries whose transient has already expired are not counted.
+     *
+     * @return int Number of live cache entries.
+     */
+    public static function getCacheEntryCount(): int {
+        $registry = get_option( self::CACHE_KEY_REGISTRY, array() );
+        if ( ! is_array( $registry ) ) {
+            return 0;
+        }
+        return count( array_filter( $registry, function ( string $key ): bool {
+            return false !== get_transient( $key );
+        } ) );
+    }
+
+    /**
+     * Delete all cached calendar feed responses and reset the registry.
+     *
+     * @return int Number of entries that were deleted.
+     */
+    public static function clearCache(): int {
+        $registry = get_option( self::CACHE_KEY_REGISTRY, array() );
+        if ( ! is_array( $registry ) ) {
+            delete_option( self::CACHE_KEY_REGISTRY );
+            return 0;
+        }
+        $count = 0;
+        foreach ( $registry as $key ) {
+            if ( delete_transient( $key ) ) {
+                $count++;
+            }
+        }
+        delete_option( self::CACHE_KEY_REGISTRY );
+        return $count;
     }
 
     /**

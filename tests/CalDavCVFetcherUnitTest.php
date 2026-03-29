@@ -218,5 +218,162 @@ class CalDavCVFetcherUnitTest extends TestCase {
         $this->assertNotNull( $capturedArgs );
         $this->assertArrayNotHasKey( 'headers', $capturedArgs );
     }
+
+    /* ------------------------------------------------------------------
+     * getCacheEntryCount()
+     * ----------------------------------------------------------------*/
+
+    public function test_should_returnZero_when_nothingHasBeenCached(): void {
+        $this->assertSame( 0, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_returnOne_when_singleFeedIsCached(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        CalDavCVFetcher::fetch( 'team' );
+
+        $this->assertSame( 1, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_returnTwo_when_twoDistinctFeedsAreCached(): void {
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        $this->configureFeed( 'feed-a', 'https://example.com/a.ics' );
+        CalDavCVFetcher::fetch( 'feed-a' );
+
+        $this->configureFeed( 'feed-b', 'https://example.com/b.ics' );
+        CalDavCVFetcher::fetch( 'feed-b' );
+
+        $this->assertSame( 2, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_notDoubleCount_when_sameFeedFetchedTwice(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        CalDavCVFetcher::fetch( 'team' );
+        // Second fetch hits the cache; registry must not grow.
+        CalDavCVFetcher::fetch( 'team' );
+
+        $this->assertSame( 1, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_returnZero_when_transientHasExpired(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        CalDavCVFetcher::fetch( 'team' );
+
+        // Simulate transient expiry by wiping the in-memory store.
+        global $cdcv_test_transients;
+        $cdcv_test_transients = array();
+
+        $this->assertSame( 0, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_returnZero_when_cachingIsDisabled(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 0 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        CalDavCVFetcher::fetch( 'team' );
+
+        $this->assertSame( 0, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_countPreExistingTransient_when_fetchedAfterRegistryWasEmpty(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+
+        // Simulate a transient that was written before the registry feature existed
+        // (e.g. a transient created by a previous plugin version, or a manual set_transient call).
+        $cacheKey = 'cdcv_feed_cache_' . md5( 'team|https://example.com/team.ics' );
+        global $cdcv_test_transients;
+        $cdcv_test_transients[ $cacheKey ] = 'PRE-EXISTING:VCALENDAR';
+        // Registry is deliberately left empty – simulates state after plugin upgrade.
+
+        // On the first fetch the cache is hit; the key must be registered.
+        $this->setHttpError( 'Should not be reached' );
+        CalDavCVFetcher::fetch( 'team' );
+
+        $this->assertSame( 1, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    /* ------------------------------------------------------------------
+     * clearCache()
+     * ----------------------------------------------------------------*/
+
+    public function test_should_returnZero_when_clearingEmptyCache(): void {
+        $this->assertSame( 0, CalDavCVFetcher::clearCache() );
+    }
+
+    public function test_should_returnOne_when_clearingCacheWithSingleEntry(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+        CalDavCVFetcher::fetch( 'team' );
+
+        $cleared = CalDavCVFetcher::clearCache();
+
+        $this->assertSame( 1, $cleared );
+    }
+
+    public function test_should_returnTwo_when_clearingCacheWithTwoEntries(): void {
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+
+        $this->configureFeed( 'feed-a', 'https://example.com/a.ics' );
+        CalDavCVFetcher::fetch( 'feed-a' );
+        $this->configureFeed( 'feed-b', 'https://example.com/b.ics' );
+        CalDavCVFetcher::fetch( 'feed-b' );
+
+        $cleared = CalDavCVFetcher::clearCache();
+
+        $this->assertSame( 2, $cleared );
+    }
+
+    public function test_should_removeCachedTransients_when_clearCacheIsCalled(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+        CalDavCVFetcher::fetch( 'team' );
+
+        CalDavCVFetcher::clearCache();
+
+        $this->assertSame( 0, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_resetRegistry_when_clearCacheIsCalled(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+        CalDavCVFetcher::fetch( 'team' );
+
+        CalDavCVFetcher::clearCache();
+
+        // Re-fetch: cache count must be 1 again, proving the registry was reset cleanly.
+        CalDavCVFetcher::fetch( 'team' );
+        $this->assertSame( 1, CalDavCVFetcher::getCacheEntryCount() );
+    }
+
+    public function test_should_notCountAlreadyExpiredEntries_when_clearing(): void {
+        $this->configureFeed( 'team', 'https://example.com/team.ics' );
+        update_option( 'cdcv_cache_ttl', 3600 );
+        $this->setHttpResponse( 200, 'BEGIN:VCALENDAR' );
+        CalDavCVFetcher::fetch( 'team' );
+
+        // Simulate transient expiry before clearing.
+        global $cdcv_test_transients;
+        $cdcv_test_transients = array();
+
+        // delete_transient returns false for missing keys; cleared count should be 0.
+        $cleared = CalDavCVFetcher::clearCache();
+        $this->assertSame( 0, $cleared );
+    }
 }
 

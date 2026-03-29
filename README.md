@@ -122,7 +122,7 @@ Tests run without a WordPress installation — the bootstrap file provides light
 
 ### CI Pipeline
 
-GitHub Actions runs the full test suite on every push and pull request against `main`/`master`. Tests are executed across PHP 7.4, 8.0, 8.1, 8.2, and 8.3.
+GitHub Actions runs the full test suite on every push and pull request against `main`/`master`. Tests are executed across PHP 8.0, 8.1, 8.2, and 8.3.
 
 ### Releases
 

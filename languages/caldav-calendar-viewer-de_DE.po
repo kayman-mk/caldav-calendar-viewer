@@ -1,0 +1,182 @@
+# German translation for CalDav Calendar Viewer
+# Copyright (C) 2024 kaymanmk
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: CalDav Calendar Viewer 1.0.1\n"
+"Report-Msgid-Bugs-To: https://github.com/kayman-mk/caldav-calendar-viewer/issues\n"
+"POT-Creation-Date: 2026-03-29T00:00:00+00:00\n"
+"PO-Revision-Date: 2026-03-29T00:00:00+00:00\n"
+"Last-Translator: kaymanmk\n"
+"Language-Team: German\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: CalDav Calendar Viewer\n"
+"X-Domain: caldav-calendar-viewer\n"
+
+#. Plugin Name of the plugin
+msgid "CalDav Calendar Viewer"
+msgstr "CalDav Kalender-Anzeige"
+
+#: caldav-calendar-viewer.php
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: caldav-calendar-viewer.php
+msgid "Missing parameters."
+msgstr "Fehlende Parameter."
+
+#: caldav-calendar-viewer.php
+msgid "Invalid nonce."
+msgstr "Ungültiger Sicherheitstoken."
+
+#: caldav-calendar-viewer.php
+#: includes/class-cdcv-shortcode.php
+msgid "No feed ID provided."
+msgstr "Keine Feed-ID angegeben."
+
+#: caldav-calendar-viewer.php
+msgid "Unable to load calendar. Please try again later."
+msgstr "Kalender konnte nicht geladen werden. Bitte später erneut versuchen."
+
+#: caldav-calendar-viewer.php
+msgid "No upcoming events found."
+msgstr "Keine bevorstehenden Termine gefunden."
+
+#: includes/class-cdcv-fetcher.php
+msgid "No feed ID provided. Use [cdcv_calendar id=\"your-feed-id\"]."
+msgstr "Keine Feed-ID angegeben. Verwende [cdcv_calendar id=\"deine-feed-id\"]."
+
+#: includes/class-cdcv-fetcher.php
+#. translators: %s: feed ID
+msgid "Unknown calendar feed ID: \"%s\". Please configure it under Settings → CalDav Calendar Viewer."
+msgstr "Unbekannte Kalender-Feed-ID: „%s". Bitte unter Einstellungen → CalDav Kalender-Anzeige konfigurieren."
+
+#: includes/class-cdcv-fetcher.php
+#. translators: %s: feed ID
+msgid "No URL configured for feed \"%s\"."
+msgstr "Keine URL für Feed „%s" konfiguriert."
+
+#: includes/class-cdcv-fetcher.php
+#. translators: %d: HTTP status code
+msgid "Failed to fetch iCal feed. HTTP status: %d"
+msgstr "iCal-Feed konnte nicht abgerufen werden. HTTP-Status: %d"
+
+#: includes/class-cdcv-settings.php
+msgid "CalDav Calendar Viewer Settings"
+msgstr "CalDav Kalender-Anzeige Einstellungen"
+
+#: includes/class-cdcv-settings.php
+msgid "Calendar Feeds"
+msgstr "Kalender-Feeds"
+
+#: includes/class-cdcv-settings.php
+msgid "Define one or more iCal feeds. Each feed needs a unique ID that you reference in the shortcode."
+msgstr "Definiere einen oder mehrere iCal-Feeds. Jeder Feed benötigt eine eindeutige ID, die im Shortcode verwendet wird."
+
+#: includes/class-cdcv-settings.php
+msgid "+ Add Feed"
+msgstr "+ Feed hinzufügen"
+
+#: includes/class-cdcv-settings.php
+msgid "General Settings"
+msgstr "Allgemeine Einstellungen"
+
+#: includes/class-cdcv-settings.php
+msgid "Cache Lifetime (seconds)"
+msgstr "Cache-Lebensdauer (Sekunden)"
+
+#: includes/class-cdcv-settings.php
+msgid "How long (in seconds) fetched calendar data should be cached. Set to 0 to disable caching."
+msgstr "Wie lange (in Sekunden) abgerufene Kalenderdaten im Cache gespeichert werden. Auf 0 setzen, um den Cache zu deaktivieren."
+
+#: includes/class-cdcv-settings.php
+msgid "Usage"
+msgstr "Verwendung"
+
+#: includes/class-cdcv-settings.php
+msgid "Add the following shortcode to any page or post, referencing a feed by its ID:"
+msgstr "Füge den folgenden Shortcode in eine Seite oder einen Beitrag ein und referenziere einen Feed über seine ID:"
+
+#: includes/class-cdcv-settings.php
+msgid "Displays upcoming events from the next 7 days as a list."
+msgstr "Zeigt bevorstehende Termine der nächsten 7 Tage als Liste an."
+
+#: includes/class-cdcv-settings.php
+msgid "Configured Feed IDs"
+msgstr "Konfigurierte Feed-IDs"
+
+#: includes/class-cdcv-settings.php
+msgid "Cache"
+msgstr "Cache"
+
+#: includes/class-cdcv-settings.php
+#. translators: %d: number of cleared cache entries
+msgid "%d cache entry cleared."
+msgid_plural "%d cache entries cleared."
+msgstr[0] "%d Cache-Eintrag geleert."
+msgstr[1] "%d Cache-Einträge geleert."
+
+#: includes/class-cdcv-settings.php
+#. translators: %d: number of cached calendar feeds
+msgid "%d calendar feed is currently cached."
+msgid_plural "%d calendar feeds are currently cached."
+msgstr[0] "%d Kalender-Feed ist aktuell im Cache gespeichert."
+msgstr[1] "%d Kalender-Feeds sind aktuell im Cache gespeichert."
+
+#: includes/class-cdcv-settings.php
+msgid "Clear Cache"
+msgstr "Cache leeren"
+
+#: includes/class-cdcv-settings.php
+msgid "Feed ID"
+msgstr "Feed-ID"
+
+#: includes/class-cdcv-settings.php
+msgid "Lowercase letters, numbers, hyphens and underscores only"
+msgstr "Nur Kleinbuchstaben, Zahlen, Bindestriche und Unterstriche"
+
+#: includes/class-cdcv-settings.php
+msgid "Unique identifier used in the shortcode (lowercase, no spaces)."
+msgstr "Eindeutige Kennung für den Shortcode (Kleinbuchstaben, keine Leerzeichen)."
+
+#: includes/class-cdcv-settings.php
+msgid "iCal Feed URL"
+msgstr "iCal-Feed-URL"
+
+#: includes/class-cdcv-settings.php
+msgid "Username"
+msgstr "Benutzername"
+
+#: includes/class-cdcv-settings.php
+msgid "Leave blank if the feed does not require authentication."
+msgstr "Leer lassen, wenn der Feed keine Authentifizierung erfordert."
+
+#: includes/class-cdcv-settings.php
+msgid "Password"
+msgstr "Passwort"
+
+#: includes/class-cdcv-settings.php
+msgid "Leave blank to keep the current password. The password is stored encrypted."
+msgstr "Leer lassen, um das aktuelle Passwort beizubehalten. Das Passwort wird verschlüsselt gespeichert."
+
+#: includes/class-cdcv-settings.php
+msgid "Remove"
+msgstr "Entfernen"
+
+#: includes/class-cdcv-shortcode.php
+msgid "Loading calendar\xe2\x80\xa6"
+msgstr "Kalender wird geladen\xe2\x80\xa6"
+
+#: includes/class-cdcv-shortcode.php
+#. translators: %s: localized date, e.g. "Monday, 29 March"
+msgid "Today — %s"
+msgstr "Heute — %s"
+
+#: includes/class-cdcv-shortcode.php
+msgid "All day"
+msgstr "Ganztägig"
+

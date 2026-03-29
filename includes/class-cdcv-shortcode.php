@@ -79,7 +79,11 @@ class CalDavCVShortcode {
             $dateObj  = new DateTimeImmutable( $dateStr, $tz );
             $isToday  = ( $dateStr === $today->format( 'Y-m-d' ) );
             $dayLabel = $isToday
-                ? __( 'Today', 'caldav-calendar-viewer' ) . ' — ' . wp_date( 'l, j F', $dateObj->getTimestamp() )
+                ? sprintf(
+                    /* translators: %s: localized date, e.g. "Monday, 29 March" */
+                    __( 'Today — %s', 'caldav-calendar-viewer' ),
+                    wp_date( 'l, j F', $dateObj->getTimestamp() )
+                )
                 : wp_date( 'l, j F', $dateObj->getTimestamp() );
 
             echo '<div class="' . esc_attr( 'cdcv-day-group' . ( $isToday ? ' cdcv-today' : '' ) ) . '">';

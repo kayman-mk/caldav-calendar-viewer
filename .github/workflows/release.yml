@@ -24,7 +24,8 @@ jobs:
       - name: Build release zip
         run: |
           mkdir -p build/caldav-calendar-viewer
-          cp -r caldav-calendar-viewer.php includes/ assets/ README.md readme.txt build/caldav-calendar-viewer/
+          cp -r caldav-calendar-viewer.php includes/ assets/ languages/ README.md readme.txt build/caldav-calendar-viewer/
+          rm build/caldav-calendar-viewer/languages/compile-mo.php
           cd build
           zip -r ../caldav-calendar-viewer-${{ steps.version.outputs.version }}.zip caldav-calendar-viewer/
 

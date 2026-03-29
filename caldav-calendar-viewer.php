@@ -36,6 +36,12 @@ $cdcv_instances = array();
 function cdcv_init() {
     global $cdcv_instances;
 
+    load_plugin_textdomain(
+        'caldav-calendar-viewer',
+        false,
+        dirname( plugin_basename( __FILE__ ) ) . '/languages'
+    );
+
     $cdcv_instances['settings']  = new CalDavCVSettings();
     $cdcv_instances['shortcode'] = new CalDavCVShortcode();
 }

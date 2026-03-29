@@ -11,4 +11,5 @@ phpunit.xml
 tests
 vendor
 *.iml
+languages/compile-mo.php
 

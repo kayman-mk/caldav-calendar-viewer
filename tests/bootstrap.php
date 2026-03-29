@@ -82,6 +82,12 @@ if ( ! function_exists( '__' ) ) {
     }
 }
 
+if ( ! function_exists( '_n' ) ) {
+    function _n( string $single, string $plural, int $number, string $domain = 'default' ): string { // NOSONAR - matches WP API signature
+        return $number === 1 ? $single : $plural;
+    }
+}
+
 if ( ! function_exists( 'esc_html' ) ) {
     function esc_html( string $text ): string { // NOSONAR - WordPress API stub
         return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );

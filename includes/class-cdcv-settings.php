@@ -211,29 +211,21 @@ class CalDavCVSettings {
                 $cleared = (int) $_GET['cdcv_cache_cleared']; // phpcs:ignore WordPress.Security.NonceVerification
                 ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php echo esc_html(
-                        $cleared === 1
-                            ? __( '1 cache entry cleared.', 'caldav-calendar-viewer' )
-                            : sprintf(
-                                /* translators: %d: number of cleared cache entries */
-                                __( '%d cache entries cleared.', 'caldav-calendar-viewer' ),
-                                $cleared
-                            )
-                    ); ?></p>
+                    <p><?php echo esc_html( sprintf(
+                        /* translators: %d: number of cleared cache entries */
+                        _n( '%d cache entry cleared.', '%d cache entries cleared.', $cleared, 'caldav-calendar-viewer' ),
+                        $cleared
+                    ) ); ?></p>
                 </div>
             <?php endif; ?>
 
             <?php $cacheCount = CalDavCVFetcher::getCacheEntryCount(); ?>
             <p>
-                <?php echo esc_html(
-                    $cacheCount === 1
-                        ? __( '1 calendar feed is currently cached.', 'caldav-calendar-viewer' )
-                        : sprintf(
-                            /* translators: %d: number of cached calendar feeds */
-                            __( '%d calendar feeds are currently cached.', 'caldav-calendar-viewer' ),
-                            $cacheCount
-                        )
-                ); ?>
+                <?php echo esc_html( sprintf(
+                    /* translators: %d: number of cached calendar feeds */
+                    _n( '%d calendar feed is currently cached.', '%d calendar feeds are currently cached.', $cacheCount, 'caldav-calendar-viewer' ),
+                    $cacheCount
+                ) ); ?>
             </p>
 
             <form method="post">

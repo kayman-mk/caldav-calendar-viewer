@@ -17,14 +17,16 @@ class CalDavCVShortcode {
      * Shortcode handler for [cdcv_calendar].
      *
      * Attributes:
-     *   id – references a feed configured in Settings → CalDav Calendar Viewer (required)
+     *   id    – references a feed configured in Settings → CalDav Calendar Viewer (required)
+     *   label – comma-separated list of category labels to filter events by (optional)
      *
      * @param array|string $atts Shortcode attributes.
      * @return string HTML output.
      */
     public function render( $atts ): string {
         $atts = shortcode_atts( array(
-            'id' => '',
+            'id'    => '',
+            'label' => '',
         ), $atts, 'cdcv_calendar' );
 
         wp_enqueue_style( 'cdcv-calendar-style' );
@@ -38,13 +40,17 @@ class CalDavCVShortcode {
 
         $containerId = 'cdcv-calendar-' . uniqid();
         $nonce = wp_create_nonce( 'cdcv_get_calendar' );
+        // Sanitize label: strip tags, trim whitespace from each entry.
+        $label = sanitize_text_field( $atts['label'] );
+
         // Pass AJAX URL and nonce to JS
         wp_localize_script( 'cdcv-calendar-async', 'cdcvAsyncCalendar', array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
         ) );
 
         // Output placeholder div for async loading
-        $html = '<div id="' . esc_attr( $containerId ) . '" class="cdcv-calendar-async" data-feed-id="' . esc_attr( $feedId ) . '" data-nonce="' . esc_attr( $nonce ) . '">'
+        $labelAttr = '' !== $label ? ' data-label="' . esc_attr( $label ) . '"' : '';
+        $html = '<div id="' . esc_attr( $containerId ) . '" class="cdcv-calendar-async" data-feed-id="' . esc_attr( $feedId ) . '" data-nonce="' . esc_attr( $nonce ) . '"' . $labelAttr . '>'
             . '<div class="cdcv-loading">' . esc_html__( 'Loading calendar…', 'caldav-calendar-viewer' ) . '</div>'
             . '</div>';
         return $html;

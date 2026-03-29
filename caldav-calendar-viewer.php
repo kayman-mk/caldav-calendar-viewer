@@ -92,6 +92,11 @@ function cdcv_ajax_get_calendar() {
     if ( empty( $feed_id ) ) {
         wp_send_json_error( array( 'message' => __( 'No feed ID provided.', 'caldav-calendar-viewer' ) ) );
     }
+
+    // Resolve label filter: comma-separated list of category names (case-insensitive).
+    // A label prefixed with "!" means the category must NOT be present on the event.
+    $labelString = ! empty( $_POST['label'] ) ? sanitize_text_field( wp_unslash( $_POST['label'] ) ) : '';
+
     $tz         = wp_timezone();
     $today      = new DateTimeImmutable( 'today', $tz );
     $rangeStart = $today->format( 'Y-m-d' );
@@ -101,6 +106,8 @@ function cdcv_ajax_get_calendar() {
         wp_send_json_error( array( 'message' => __( 'Unable to load calendar. Please try again later.', 'caldav-calendar-viewer' ) ) );
     }
     $events = CalDavCVParser::parse( $icalBody, $rangeStart, $rangeEnd );
+    $events = CalDavCVParser::filterByLabel( $events, $labelString );
+
     if ( empty( $events ) ) {
         $html = '<div class="cdcv-no-events">' . esc_html__( 'No upcoming events found.', 'caldav-calendar-viewer' ) . '</div>';
     } else {

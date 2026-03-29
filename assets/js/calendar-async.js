@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function fetchCalendar(feedId, nonce, containerId) {
+    function fetchCalendar(feedId, nonce, containerId, label) {
         var container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = '<div class="cdcv-loading">Loading calendar…</div>';
@@ -28,7 +28,11 @@
         xhr.onerror = function () {
             container.innerHTML = '<div class="cdcv-error">Unable to load calendar.<br>Status: ' + xhr.status + '</div>';
         };
-        xhr.send('action=cdcv_get_calendar&feed_id=' + encodeURIComponent(feedId) + '&nonce=' + encodeURIComponent(nonce));
+        var body = 'action=cdcv_get_calendar&feed_id=' + encodeURIComponent(feedId) + '&nonce=' + encodeURIComponent(nonce);
+        if (label) {
+            body += '&label=' + encodeURIComponent(label);
+        }
+        xhr.send(body);
     }
 
     function initAsyncCalendars() {
@@ -38,8 +42,9 @@
             var feedId = el.getAttribute('data-feed-id');
             var nonce = el.getAttribute('data-nonce');
             var containerId = el.id;
+            var label = el.getAttribute('data-label') || '';
             if (feedId && nonce && containerId) {
-                fetchCalendar(feedId, nonce, containerId);
+                fetchCalendar(feedId, nonce, containerId, label);
             }
         }
     }

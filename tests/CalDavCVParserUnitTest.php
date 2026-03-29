@@ -627,5 +627,226 @@ class CalDavCVParserUnitTest extends TestCase {
             $this->assertArrayNotHasKey( 'exdates', $event );
         }
     }
+
+    /* ------------------------------------------------------------------
+     * CATEGORIES parsing
+     * ----------------------------------------------------------------*/
+
+    public function test_should_returnEmptyCategories_when_eventHasNoCategoriesProperty(): void {
+        $ical = $this->buildIcal(
+            $this->buildEvent( array(
+                'SUMMARY' => 'No Category',
+                'DTSTART' => '20260327T090000Z',
+            ) )
+        );
+
+        $events = CalDavCVParser::parse( $ical );
+
+        $this->assertCount( 1, $events );
+        $this->assertSame( array(), $events[0]['categories'] );
+    }
+
+    public function test_should_parseSingleCategory_when_eventHasOneCategoriesValue(): void {
+        $ical = $this->buildIcal(
+            $this->buildEvent( array(
+                'SUMMARY'    => 'Team Meeting',
+                'DTSTART'    => '20260327T090000Z',
+                'CATEGORIES' => 'Work',
+            ) )
+        );
+
+        $events = CalDavCVParser::parse( $ical );
+
+        $this->assertCount( 1, $events );
+        $this->assertSame( array( 'Work' ), $events[0]['categories'] );
+    }
+
+    public function test_should_parseMultipleCategories_when_categoriesValueIsCommaSeparated(): void {
+        $ical = $this->buildIcal(
+            $this->buildEvent( array(
+                'SUMMARY'    => 'Team Meeting',
+                'DTSTART'    => '20260327T090000Z',
+                'CATEGORIES' => 'Work,Important,Q1',
+            ) )
+        );
+
+        $events = CalDavCVParser::parse( $ical );
+
+        $this->assertCount( 1, $events );
+        $this->assertSame( array( 'Work', 'Important', 'Q1' ), $events[0]['categories'] );
+    }
+
+    public function test_should_accumulateCategories_when_eventHasMultipleCategoriesLines(): void {
+        // Build event manually to include two CATEGORIES lines.
+        $eventBlock = "BEGIN:VEVENT\r\nSUMMARY:Multi Cat\r\nDTSTART:20260327T090000Z\r\nCATEGORIES:Work\r\nCATEGORIES:Personal\\,Family\r\nEND:VEVENT";
+        $ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\n{$eventBlock}\r\nEND:VCALENDAR";
+
+        $events = CalDavCVParser::parse( $ical );
+
+        $this->assertCount( 1, $events );
+        $this->assertContains( 'Work', $events[0]['categories'] );
+        $this->assertContains( 'Personal,Family', $events[0]['categories'] );
+    }
+
+    /* ------------------------------------------------------------------
+     * filterByLabel() – empty / no-op cases
+     * ----------------------------------------------------------------*/
+
+    public function test_should_returnAllEvents_when_labelStringIsEmpty(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'Work' ) ),
+            array( 'summary' => 'B', 'categories' => array() ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, '' );
+
+        $this->assertSame( $events, $result );
+    }
+
+    public function test_should_returnAllEvents_when_labelStringIsOnlyCommasAndSpaces(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'Work' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, ' , , ' );
+
+        $this->assertSame( $events, $result );
+    }
+
+    /* ------------------------------------------------------------------
+     * filterByLabel() – required labels (plain, no prefix)
+     * ----------------------------------------------------------------*/
+
+    public function test_should_keepEvent_when_requiredLabelIsPresent(): void {
+        $events = array(
+            array( 'summary' => 'Match',    'categories' => array( 'Work' ) ),
+            array( 'summary' => 'No match', 'categories' => array( 'Personal' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'Work' );
+
+        $this->assertCount( 1, $result );
+        $this->assertSame( 'Match', $result[0]['summary'] );
+    }
+
+    public function test_should_matchCaseInsensitively_when_labelCaseDiffersFromCategory(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'WORK' ) ),
+            array( 'summary' => 'B', 'categories' => array( 'work' ) ),
+            array( 'summary' => 'C', 'categories' => array( 'Work' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'wOrK' );
+
+        $this->assertCount( 3, $result );
+    }
+
+    public function test_should_requireAllLabels_when_multiplePlainLabelsGiven(): void {
+        $events = array(
+            array( 'summary' => 'Both',     'categories' => array( 'Work', 'Important' ) ),
+            array( 'summary' => 'WorkOnly', 'categories' => array( 'Work' ) ),
+            array( 'summary' => 'Neither',  'categories' => array( 'Personal' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'Work,Important' );
+
+        $this->assertCount( 1, $result );
+        $this->assertSame( 'Both', $result[0]['summary'] );
+    }
+
+    public function test_should_excludeEvent_when_eventHasNoCategories_and_requiredLabelGiven(): void {
+        $events = array(
+            array( 'summary' => 'No cats', 'categories' => array() ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'Work' );
+
+        $this->assertCount( 0, $result );
+    }
+
+    /* ------------------------------------------------------------------
+     * filterByLabel() – excluded labels ("!" prefix)
+     * ----------------------------------------------------------------*/
+
+    public function test_should_excludeEvent_when_excludedLabelIsPresent(): void {
+        $events = array(
+            array( 'summary' => 'Cancelled', 'categories' => array( 'Work', 'Cancelled' ) ),
+            array( 'summary' => 'Active',    'categories' => array( 'Work' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, '!Cancelled' );
+
+        $this->assertCount( 1, $result );
+        $this->assertSame( 'Active', $result[0]['summary'] );
+    }
+
+    public function test_should_keepEvent_when_excludedLabelIsAbsent(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'Work' ) ),
+            array( 'summary' => 'B', 'categories' => array() ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, '!Private' );
+
+        $this->assertCount( 2, $result );
+    }
+
+    public function test_should_excludeCaseInsensitively_when_excludedLabelCaseDiffers(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'PRIVATE' ) ),
+            array( 'summary' => 'B', 'categories' => array( 'private' ) ),
+            array( 'summary' => 'C', 'categories' => array( 'Public' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, '!Private' );
+
+        $this->assertCount( 1, $result );
+        $this->assertSame( 'C', $result[0]['summary'] );
+    }
+
+    /* ------------------------------------------------------------------
+     * filterByLabel() – mixed required + excluded labels
+     * ----------------------------------------------------------------*/
+
+    public function test_should_applyBothRules_when_requiredAndExcludedLabelsAreMixed(): void {
+        $events = array(
+            array( 'summary' => 'Work+Cancelled', 'categories' => array( 'Work', 'Cancelled' ) ),
+            array( 'summary' => 'Work only',      'categories' => array( 'Work' ) ),
+            array( 'summary' => 'Personal',       'categories' => array( 'Personal' ) ),
+            array( 'summary' => 'None',           'categories' => array() ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'Work,!Cancelled' );
+
+        $this->assertCount( 1, $result );
+        $this->assertSame( 'Work only', $result[0]['summary'] );
+    }
+
+    public function test_should_returnNoEvents_when_sameLabelIsRequiredAndExcluded(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'Work' ) ),
+        );
+
+        // Logically contradictory: Work must be present AND must not be present.
+        $result = CalDavCVParser::filterByLabel( $events, 'Work,!Work' );
+
+        $this->assertCount( 0, $result );
+    }
+
+    public function test_should_reindexResult_when_eventsAreFilteredOut(): void {
+        $events = array(
+            array( 'summary' => 'A', 'categories' => array( 'Work' ) ),
+            array( 'summary' => 'B', 'categories' => array( 'Personal' ) ),
+            array( 'summary' => 'C', 'categories' => array( 'Work' ) ),
+        );
+
+        $result = CalDavCVParser::filterByLabel( $events, 'Work' );
+
+        $this->assertCount( 2, $result );
+        // Keys must be re-indexed (0 and 1, not 0 and 2).
+        $this->assertArrayHasKey( 0, $result );
+        $this->assertArrayHasKey( 1, $result );
+        $this->assertArrayNotHasKey( 2, $result );
+    }
 }
 

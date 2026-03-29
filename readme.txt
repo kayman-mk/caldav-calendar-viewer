@@ -22,6 +22,9 @@ CalDav Calendar Viewer fetches and displays events from any standard iCal (.ics)
 * **Basic Authentication** – Supply a username and password per feed for protected calendars.
 * **Encrypted Credentials** – Passwords are stored using AES-256-CBC encryption in the database.
 * **Caching** – Configurable cache lifetime reduces external HTTP requests (defaults to 1 hour).
+* **Label / Category Filtering** – Filter events by iCal `CATEGORIES` labels using the `label` shortcode attribute.
+  Accepts a comma-separated list; **all** plain labels must be present on an event for it to be shown.
+  Prefix a label with `!` to exclude events that carry that category. Matching is case-insensitive.
 * **7-Day Rolling Window** – Automatically fetches and displays only the next 7 days of events.
 * **Responsive Event List** – Clean event list layout that adapts to all screen sizes.
 * **Event Tooltips** – Hover over an event to see its description.
@@ -61,12 +64,23 @@ You can configure multiple feeds — each gets its own ID.
 = Shortcode Attributes =
 
 * `id` (required) – The feed ID configured in **Settings → CalDav Calendar Viewer**.
+* `label` (optional) – A comma-separated list of iCal `CATEGORIES` values to filter events by. **All** plain labels
+  must be present on an event for it to be shown. Prefix a label with `!` to exclude events that carry that category.
+  Matching is case-insensitive. Omit to show all events.
 
 = Examples =
 
 `[cdcv_calendar id="team-calendar"]`
 
 `[cdcv_calendar id="hr-events"]`
+
+`[cdcv_calendar id="team-calendar" label="Work"]`
+
+`[cdcv_calendar id="team-calendar" label="Work,Important"]`
+
+`[cdcv_calendar id="team-calendar" label="Work,!Cancelled"]`
+
+`[cdcv_calendar id="team-calendar" label="!Private"]`
 
 == Frequently Asked Questions ==
 
@@ -84,6 +98,17 @@ Yes. Configure multiple feeds in the settings, then use separate shortcodes:
 
 `[cdcv_calendar id="team"]`
 `[cdcv_calendar id="holidays"]`
+
+= Can I filter events by category or label? =
+
+Yes. Use the `label` attribute with a comma-separated list of iCal `CATEGORIES` values. **All** plain labels must be
+present on an event for it to appear. Prefix a label with `!` to exclude events carrying that category.
+The match is case-insensitive:
+
+`[cdcv_calendar id="team" label="Work"]`
+`[cdcv_calendar id="team" label="Work,Important"]`
+
+If your calendar application does not populate the `CATEGORIES` field, all events are shown regardless of the `label` attribute.
 
 = How often is the calendar data refreshed? =
 
@@ -105,6 +130,10 @@ Yes. The calendar uses CSS classes prefixed with `cdcv-` that you can override i
 
 == Changelog ==
 
+= 1.0.1 =
+* Added `label` shortcode attribute to filter events by iCal `CATEGORIES` values (comma-separated, case-insensitive).
+* Parser now extracts the `CATEGORIES` property from VEVENT blocks.
+
 = 1.0.0 =
 * Initial release.
 * Multiple iCal feed support with per-feed URL, username, and password.
@@ -119,6 +148,9 @@ Yes. The calendar uses CSS classes prefixed with `cdcv-` that you can override i
 * GitHub Actions CI and automated release workflow.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Adds optional label/category filtering via the new `label` shortcode attribute. No breaking changes.
 
 = 1.0.0 =
 Initial release.

@@ -11,6 +11,9 @@ A WordPress plugin that displays events from iCal (.ics) feeds in a clean 7-day 
 - **Encrypted Credentials** – Passwords are stored encrypted (AES-256-CBC) in the database.
 - **Caching** – Configurable cache lifetime to reduce external requests (defaults to 1 hour).
 - **Shortcode** – Display any feed anywhere via `[cdcv_calendar id="my-feed"]`.
+- **Label Filtering** – Optionally filter events by one or more iCal `CATEGORIES` labels using the `label` attribute.
+  When multiple labels are given, **all** must be present on the event.
+  Prefix a label with `!` to **exclude** events that carry that category.
 - **7-Day Window** – Always fetches and displays only the next 7 days of events.
 - **Responsive Design** – Clean event list adapts to mobile screens.
 - **Tooltips** – Hover over events to see their description.
@@ -63,12 +66,17 @@ Reference a configured feed by its ID:
 | Attribute | Required | Default | Description                                       |
 |-----------|----------|---------|---------------------------------------------------|
 | `id`      | **yes**  | —       | The feed ID configured in Settings → CalDav Calendar Viewer. |
+| `label`   | no       | _(all)_ | Comma-separated list of iCal `CATEGORIES` values to filter events by. **All** plain labels must be present; labels prefixed with `!` must **not** be present. Matching is case-insensitive. |
 
 **Examples:**
 
 ```
 [cdcv_calendar id="team-calendar"]
 [cdcv_calendar id="hr-events"]
+[cdcv_calendar id="team-calendar" label="Work"]
+[cdcv_calendar id="team-calendar" label="Work,Important"]
+[cdcv_calendar id="team-calendar" label="Work,!Cancelled"]
+[cdcv_calendar id="team-calendar" label="!Private"]
 ```
 
 ## File Structure

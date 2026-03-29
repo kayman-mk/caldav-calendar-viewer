@@ -20,7 +20,7 @@ class CalDavCVParser {
      * Parse raw iCal text into an array of events.
      *
      * Each event is an associative array with keys:
-     *   summary, description, location, dtstart, dtend, uid, url
+     *   summary, description, location, dtstart, dtend, uid, url, all_day, categories
      *
      * When $rangeStart and/or $rangeEnd are provided the result set is
      * filtered to only include events that overlap with the given window.
@@ -31,7 +31,7 @@ class CalDavCVParser {
      * @param string $icalText   Raw iCal (.ics) content.
      * @param string $rangeStart Inclusive start of the date range (Y-m-d), empty to skip.
      * @param string $rangeEnd   Exclusive end of the date range (Y-m-d), empty to skip.
-     * @return array<int, array<string, string>> Sorted list of events.
+     * @return array<int, array<string, mixed>> Sorted list of events.
      */
     public static function parse( string $icalText, string $rangeStart = '', string $rangeEnd = '' ): array {
         $events = array();
@@ -82,6 +82,56 @@ class CalDavCVParser {
     }
 
     /**
+     * Filter an array of parsed events by a comma-separated label expression.
+     *
+     * Label rules (case-insensitive):
+     *   - Plain label  – the event's CATEGORIES MUST contain this value.
+     *   - "!label"     – the event's CATEGORIES MUST NOT contain this value.
+     *
+     * When multiple plain labels are given all of them must be present.
+     * An empty $labelString returns the original array unchanged.
+     *
+     * @param array<int, array<string, mixed>> $events      Parsed event list.
+     * @param string                           $labelString Comma-separated label expression, e.g. "Work,!Cancelled".
+     * @return array<int, array<string, mixed>> Filtered event list (re-indexed).
+     */
+    public static function filterByLabel( array $events, string $labelString ): array {
+        $required = array();
+        $excluded = array();
+
+        foreach ( explode( ',', $labelString ) as $token ) {
+            $token = trim( $token );
+            if ( '' === $token ) {
+                continue;
+            }
+            if ( str_starts_with( $token, '!' ) ) {
+                $excluded[] = strtolower( substr( $token, 1 ) );
+            } else {
+                $required[] = strtolower( $token );
+            }
+        }
+
+        if ( empty( $required ) && empty( $excluded ) ) {
+            return $events;
+        }
+
+        return array_values( array_filter( $events, function ( array $event ) use ( $required, $excluded ): bool {
+            $categories = array_map( 'strtolower', $event['categories'] );
+            foreach ( $required as $label ) {
+                if ( ! in_array( $label, $categories, true ) ) {
+                    return false;
+                }
+            }
+            foreach ( $excluded as $label ) {
+                if ( in_array( $label, $categories, true ) ) {
+                    return false;
+                }
+            }
+            return true;
+        } ) );
+    }
+
+    /**
      * Check whether an event overlaps with the requested date range.
      *
      * The comparison uses the date portion (first 10 chars) of dtstart / dtend.
@@ -125,6 +175,7 @@ class CalDavCVParser {
             'all_day'     => false,
             'rrule'       => '',
             'exdates'     => array(),
+            'categories'  => array(),
         );
 
         $lines = explode( "\n", trim( $block ) );
@@ -180,6 +231,15 @@ class CalDavCVParser {
                         $normalized = self::normalizeDatetime( trim( $d ) );
                         if ( '' !== $normalized ) {
                             $event['exdates'][] = $normalized;
+                        }
+                    }
+                    break;
+                case 'CATEGORIES':
+                    // CATEGORIES values are comma-separated; multiple CATEGORIES lines accumulate.
+                    foreach ( explode( ',', $value ) as $cat ) {
+                        $cat = trim( self::unescape( $cat ) );
+                        if ( '' !== $cat ) {
+                            $event['categories'][] = $cat;
                         }
                     }
                     break;

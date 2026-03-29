@@ -207,6 +207,17 @@ if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
     }
 }
 
+if ( ! function_exists( 'delete_transient' ) ) {
+    function delete_transient( string $key ): bool { // NOSONAR - WordPress API stub
+        global $cdcv_test_transients;
+        if ( array_key_exists( $key, $cdcv_test_transients ) ) {
+            unset( $cdcv_test_transients[ $key ] );
+            return true;
+        }
+        return false;
+    }
+}
+
 /* ------------------------------------------------------------------
  * Hook stubs (no-ops for unit tests).
  * ----------------------------------------------------------------*/
@@ -236,6 +247,41 @@ if ( ! function_exists( 'shortcode_atts' ) ) {
             }
         }
         return $result;
+    }
+}
+
+if ( ! function_exists( 'current_user_can' ) ) {
+    function current_user_can( string $capability ): bool { // NOSONAR - WordPress API stub
+        return true;
+    }
+}
+
+if ( ! function_exists( 'check_admin_referer' ) ) {
+    function check_admin_referer( string $action = '', string $query_arg = '_wpnonce' ): void { // NOSONAR - WordPress API stub
+    }
+}
+
+if ( ! function_exists( 'wp_nonce_field' ) ) {
+    function wp_nonce_field( string $action = '', string $name = '_wpnonce', bool $referer = true, bool $echo = true ): string { // NOSONAR - WordPress API stub
+        return '';
+    }
+}
+
+if ( ! function_exists( 'wp_safe_redirect' ) ) {
+    function wp_safe_redirect( string $location, int $status = 302, string $x_redirect_by = 'WordPress' ): bool { // NOSONAR - WordPress API stub
+        return true;
+    }
+}
+
+if ( ! function_exists( 'add_query_arg' ) ) {
+    function add_query_arg( array $args, string $url = '' ): string { // NOSONAR - WordPress API stub
+        return $url . '?' . http_build_query( $args );
+    }
+}
+
+if ( ! function_exists( 'admin_url' ) ) {
+    function admin_url( string $path = '' ): string { // NOSONAR - WordPress API stub
+        return 'http://example.com/wp-admin/' . ltrim( $path, '/' );
     }
 }
 

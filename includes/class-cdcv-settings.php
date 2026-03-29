@@ -30,6 +30,7 @@ class CalDavCVSettings {
     public function __construct() {
         add_action( 'admin_menu', array( $this, 'addSettingsPage' ) );
         add_action( 'admin_init', array( $this, 'registerSettings' ) );
+        add_action( 'admin_init', array( $this, 'handleClearCache' ) );
     }
 
     /**
@@ -58,6 +59,29 @@ class CalDavCVSettings {
             'type'              => 'integer',
             'sanitize_callback' => 'absint',
         ) );
+    }
+
+    /**
+     * Handle the "Clear Cache" form submission.
+     *
+     * Verifies the nonce, clears the cache, then redirects back to the
+     * settings page with a query parameter indicating how many entries
+     * were removed.
+     */
+    public function handleClearCache(): void {
+        if ( ! isset( $_POST['cdcv_action'] ) || 'clear_cache' !== $_POST['cdcv_action'] ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        check_admin_referer( 'cdcv_clear_cache' );
+        $count = CalDavCVFetcher::clearCache();
+        wp_safe_redirect( add_query_arg( array(
+            'page'               => self::PAGE_SLUG,
+            'cdcv_cache_cleared' => $count,
+        ), admin_url( 'options-general.php' ) ) );
+        exit;
     }
 
     /* ------------------------------------------------------------------
@@ -179,6 +203,49 @@ class CalDavCVSettings {
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
+
+            <hr />
+            <h2><?php esc_html_e( 'Cache', 'caldav-calendar-viewer' ); ?></h2>
+
+            <?php if ( isset( $_GET['cdcv_cache_cleared'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification
+                $cleared = (int) $_GET['cdcv_cache_cleared']; // phpcs:ignore WordPress.Security.NonceVerification
+                ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php echo esc_html(
+                        $cleared === 1
+                            ? __( '1 cache entry cleared.', 'caldav-calendar-viewer' )
+                            : sprintf(
+                                /* translators: %d: number of cleared cache entries */
+                                __( '%d cache entries cleared.', 'caldav-calendar-viewer' ),
+                                $cleared
+                            )
+                    ); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php $cacheCount = CalDavCVFetcher::getCacheEntryCount(); ?>
+            <p>
+                <?php echo esc_html(
+                    $cacheCount === 1
+                        ? __( '1 calendar feed is currently cached.', 'caldav-calendar-viewer' )
+                        : sprintf(
+                            /* translators: %d: number of cached calendar feeds */
+                            __( '%d calendar feeds are currently cached.', 'caldav-calendar-viewer' ),
+                            $cacheCount
+                        )
+                ); ?>
+            </p>
+
+            <form method="post">
+                <?php wp_nonce_field( 'cdcv_clear_cache' ); ?>
+                <input type="hidden" name="cdcv_action" value="clear_cache" />
+                <?php submit_button(
+                    __( 'Clear Cache', 'caldav-calendar-viewer' ),
+                    'secondary',
+                    'cdcv_clear_cache_submit',
+                    false
+                ); ?>
+            </form>
         </div>
 
         <style>
